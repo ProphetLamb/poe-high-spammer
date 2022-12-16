@@ -1,5 +1,10 @@
 # POE High Spammer
 
+## Step 0: Start app
+
+Install python, then install `scipy`, `numpy`, `pynput`, `pyautogui` using pip.
+Start
+
 ## Step 1: Select target
 
 1. In a stash-tab, place your target item.
