@@ -5,6 +5,7 @@ import scipy
 import imageio
 import numpy as np
 from pynput import keyboard, mouse
+import random
 
 def masked_screenshot(region: tuple) -> np.ndarray:
   """Take a screenshot of the given region and apply some processing to it.
@@ -211,7 +212,7 @@ class Application():
   def spam(self):
     if not self.spammer_active:
       return
-    root.after(200, self.spam)
+    root.after(200 + random.randrange(0, 100), self.spam)
 
     # check whether the selected region exceeds the threshold
     img = masked_screenshot(self.select_region)
