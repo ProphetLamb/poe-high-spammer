@@ -118,13 +118,11 @@ class Application():
     self.master_screen.attributes("-topmost", True)
 
   def set_select(self, x1, y1, x2, y2):
+    self.select_region = (x1, y1, x2, y2)
     img = masked_screenshot(self.select_region)
     area = measure_bright_box(img)
 
-    self.select_region = (x1, y1, x2, y2)
     self.select_lbl["text"] = "largest rect {}px".format(area)
-
-
 
   def on_select_button_release(self, event):
     if self.start_x <= self.current_x and self.start_y <= self.current_y:
