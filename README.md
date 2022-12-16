@@ -3,7 +3,8 @@
 ## Step 0: Start app
 
 Install python, then install `scipy`, `numpy`, `pynput`, `pyautogui` using pip.
-Start
+
+Start the app (`python.exe ./main.py`)
 
 ## Step 1: Select target
 
