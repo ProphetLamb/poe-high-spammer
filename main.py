@@ -2,7 +2,6 @@ from tkinter import *
 import pyautogui
 import scipy.ndimage
 import scipy
-import imageio
 import numpy as np
 from pynput import keyboard, mouse
 import random
