@@ -53,6 +53,9 @@ class Application():
     self.hotkey_keycode = None
     self.hotkey_listener = None
     self.spammer_active = False
+    self.legal_mode = True
+    self.scroll_listener = None
+    self.queued_scroll = 0
 
     root.geometry('400x200+200+200')  # set new geometry
     root.title('POE High Spammer')
@@ -83,7 +86,7 @@ class Application():
     self.threshold_entry.bind("<Tab>", self.on_threshold_change)
 
     # auto-clicker
-    Label(self.menu_frame, text="auto-clicker").pack(side="top", fill="x")
+    Label(self.menu_frame, text="spammer").pack(side="top", fill="x")
     # hotkey
     hotkey = Frame(self.menu_frame, height=5, bg="")
     hotkey.pack(side="top", fill="x")
@@ -98,6 +101,12 @@ class Application():
     Label(spammer, text="spammer").pack(side="left", fill="y")
     self.spammer_lbl = Label(spammer, text="inactive", fg="red")
     self.spammer_lbl.pack(side="right", fill="y")
+    # legal mode
+    legal = Frame(self.menu_frame, height=5, bg="")
+    legal.pack(side="top", fill="x")
+    Label(legal, text="legal mode").pack(side="left", fill="y")
+    self.legal_btn = Button(legal, command=self.toggle_legal_mode, text="on")
+    self.legal_btn.pack(side="right", fill="y")
 
     # selector overlay
     self.master_screen = Toplevel(root)
@@ -105,6 +114,10 @@ class Application():
     self.master_screen.attributes("-transparent", "maroon3")
     self.picture_frame = Frame(self.master_screen, background="maroon3")
     self.picture_frame.pack(fill=BOTH, expand=YES)
+
+  # -----------------------------------------------------------------------------
+  # REGION SELECTION
+  # -----------------------------------------------------------------------------
 
   def enter_select_mode(self):
     self.master_screen.deiconify()
@@ -175,9 +188,17 @@ class Application():
     self.snip_surface.coords(1, self.start_x, self.start_y, self.current_x, self.current_y)
     return event
 
+  # -----------------------------------------------------------------------------
+  # AREA THRESHOLD
+  # -----------------------------------------------------------------------------
+
   def on_threshold_change(self, event):
     self.select_threshold = int(self.threshold_entry.get())
     return event
+
+  # -----------------------------------------------------------------------------
+  # HOTKEY BINDING
+  # -----------------------------------------------------------------------------
 
   def enter_hotkey_mode(self):
     self.hotkey_edit_btn["text"] = "stop"
@@ -204,6 +225,13 @@ class Application():
     self.hotkey_edit_label["text"] = event.keysym
     return event
 
+  def toggle_legal_mode(self):
+    self.legal_mode = not self.legal_mode
+    self.legal_btn["text"] = "on" if self.legal_mode else "off"
+
+  # -----------------------------------------------------------------------------
+  # SPAMMER TOGGLE
+  # -----------------------------------------------------------------------------
 
   def on_spammer_triggered(self, event):
     if not hasattr(event, "vk"):
@@ -220,20 +248,74 @@ class Application():
     self.spammer_lbl["fg"] = "green"
     # active the spammer
     self.spammer_active = True
-    self.spam()
-
+    if self.legal_mode:
+      self.begin_spam_legal()
+    else:
+      self.begin_spam_illegal()
 
   def exit_spam_mode(self):
     self.spammer_lbl["text"] = "inactive"
     self.spammer_lbl["fg"] = "red"
     # deactivate the spammer
     self.spammer_active = False
+    if self.legal_mode:
+      self.stop_spam_legal()
+    else:
+      self.stop_spam_illegal()
 
-  def spam(self):
+  # -----------------------------------------------------------------------------
+  # LEGAL SPAMMING
+  # -----------------------------------------------------------------------------
+
+  def begin_spam_legal(self):
+    """ remaps the scroll wheel to the left mouse button
+    """
+    self.queued_scroll = 0 # reset the scroll queue
+    self.scroll_listener = mouse.Listener(on_scroll=self.on_scroll)
+    self.scroll_listener.start()
+    self.spam_legal_loop()
+
+  def stop_spam_legal(self):
+    """ stops the remapping of the scroll wheel to the left mouse button
+    """
+    if self.scroll_listener is not None:
+      self.scroll_listener.stop()
+      self.scroll_listener = None
+
+  def spam_legal_loop(self):
+    """ consumes the scroll queue and repeats left mouse clicks in random intervals around 4Hz
+    """
     if not self.spammer_active:
       return
-    root.after(200 + random.randrange(0, 100), self.spam)
+    root.after(190 + random.randrange(0, 110), self.spam_legal_loop)
+    rem_scroll = self.queued_scroll - 1
+    if rem_scroll >= 0:
+      self.queued_scroll = rem_scroll
+      self.spam_once()
 
+  def on_scroll(self, x, y, dx, dy):
+    # queue scroll action
+    self.queued_scroll += 1
+
+  # -----------------------------------------------------------------------------
+  # ILLEGAL SPAMMING
+  # -----------------------------------------------------------------------------
+
+  def begin_spam_illegal(self):
+    self.spam_illegal_loop()
+
+  def stop_spam_illegal(self):
+    pass
+
+  def spam_illegal_loop(self):
+    """ repeats left mouse clicks in random intervals around 4Hz
+    """
+    if not self.spammer_active:
+      return
+    root.after(190 + random.randrange(0, 110), self.spam_illegal_loop)
+    self.spam_once()
+
+  def spam_once(self):
     # check whether the selected region exceeds the threshold
     img = masked_screenshot(self.select_region)
     area = measure_bright_box(img)
