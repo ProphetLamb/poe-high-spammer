@@ -20,7 +20,6 @@ class Application():
     self.hotkey_keycode = None
     self.hotkey_listener = None
     self.spammer_active = False
-    self.legal_mode = True
     self.scroll_listener = None
     self.queued_scroll = 0
     self.mouse_sim = mouse.Controller()
@@ -35,7 +34,7 @@ class Application():
 
     # menu frame
     self.menu_frame = Frame(master, bg="white")
-    self.menu_frame.pack(side="top", fill="x", expand='yes')
+    self.menu_frame.pack(side="top", fill="x")
 
     # selection
     Label(self.menu_frame, text="selection").pack(side="top", fill="x")
@@ -73,12 +72,6 @@ class Application():
     Label(spammer, text="spammer", bg="white").pack(side="left", fill="y")
     self.spammer_lbl = Label(spammer, text="inactive", fg="red", bg="white")
     self.spammer_lbl.pack(side="right", fill="y")
-    # legal mode
-    # legal = Frame(self.menu_frame, height=5, bg="")
-    # legal.pack(side="top", fill="x")
-    # Label(legal, text="legal mode").pack(side="left", fill="y")
-    # self.legal_btn = Button(legal, command=self.toggle_legal_mode, text="on")
-    # self.legal_btn.pack(side="right", fill="y")
 
     # selector overlay
     self.master_screen = Toplevel(root)
@@ -121,11 +114,15 @@ class Application():
   def set_select(self, x1, y1, x2, y2):
     self.select_region = (x1, y1, x2, y2)
     img = masked_screenshot(self.select_region, self.cross_kernel)
-    box_area = measure_bright_box(img)
-    img_area = img.shape[0] * img.shape[1]
-    fill_ratio = box_area / float(img_area) * 100
+    box_area = pow(measure_bright_box(img),.5)
+    img_area = pow(img.shape[0] * img.shape[1],.5)
+    fill_ratio = box_area / float(img_area)
 
-    self.select_lbl["text"] = "found {}px² in {}px² ({:2.2f}%)".format(box_area, img_area, fill_ratio)
+    self.select_lbl["text"] = "{}found {} in {} ({:2.2f}%)".format("" if fill_ratio > .75 else "LOW CERTAINTY ", int(box_area), int(img_area), fill_ratio * 100)
+    if fill_ratio > .75:
+      self.select_lbl["fg"] = "black"
+    else:
+      self.select_lbl["fg"] = "red"
 
     # update the threshold based on the area
     # use 90% of the area rounded down to a multiple of 100 to avoid false positives
@@ -200,10 +197,6 @@ class Application():
     self.hotkey_edit_label["text"] = event.keysym
     return event
 
-  def toggle_legal_mode(self):
-    self.legal_mode = not self.legal_mode
-    self.legal_btn["text"] = "on" if self.legal_mode else "off"
-
   # -----------------------------------------------------------------------------
   # SPAMMER TOGGLE
   # -----------------------------------------------------------------------------
@@ -223,20 +216,14 @@ class Application():
     self.spammer_lbl["fg"] = "green"
     # active the spammer
     self.spammer_active = True
-    if self.legal_mode:
-      self.begin_spam_legal()
-    else:
-      self.begin_spam_illegal()
+    self.begin_spam_legal()
 
   def exit_spam_mode(self):
     self.spammer_lbl["text"] = "inactive"
     self.spammer_lbl["fg"] = "red"
     # deactivate the spammer
     self.spammer_active = False
-    if self.legal_mode:
-      self.stop_spam_legal()
-    else:
-      self.stop_spam_illegal()
+    self.stop_spam_legal()
 
   # -----------------------------------------------------------------------------
   # LEGAL SPAMMING
@@ -271,24 +258,6 @@ class Application():
   def on_scroll(self, x, y, dx, dy):
     # queue scroll actions
     self.queued_scroll += abs(dx) + abs(dy)
-
-  # -----------------------------------------------------------------------------
-  # ILLEGAL SPAMMING
-  # -----------------------------------------------------------------------------
-
-  def begin_spam_illegal(self):
-    self.spam_illegal_loop()
-
-  def stop_spam_illegal(self):
-    pass
-
-  def spam_illegal_loop(self):
-    """ repeats left mouse clicks in random intervals around 4Hz
-    """
-    if not self.spammer_active:
-      return
-    root.after(190 + random.randrange(0, 110), self.spam_illegal_loop)
-    self.spam_once()
 
   def spam_once(self):
     # check whether the selected region exceeds the threshold
