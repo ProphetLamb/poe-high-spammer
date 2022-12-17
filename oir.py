@@ -23,10 +23,11 @@ def get_cross_kernel(size: int) -> np.ndarray:
           kernel[x,y] = 1
   return kernel
 
-def masked_screenshot(region: tuple) -> np.ndarray:
+def masked_screenshot(region: tuple, kernel: np.ndarray) -> np.ndarray:
   """Take a screenshot of the given region and apply some processing to it.
   Args:
       region (tuple): The region from top-left in the form (x1, y1, x2, y2)
+      kernel (np.ndarray): The kernel used for dilation and erosion
   Returns:
       np.ndarray: The monochrome screenshot taken from the given region
   """
@@ -39,8 +40,8 @@ def masked_screenshot(region: tuple) -> np.ndarray:
   # now the dark box will be 0, and the bright box will be 255, which can easily be detected using the scipy.ndimage.morphology
   img = (img > 180) * 255
   # finally apply dilation and erosion to complete possible holes in the bright box border
-  img = scipy.ndimage.morphology.binary_dilation(img, structure=cross_kernel).astype(img.dtype)
-  img = scipy.ndimage.morphology.binary_erosion(img, structure=cross_kernel).astype(img.dtype)
+  img = scipy.ndimage.morphology.binary_dilation(img, structure=kernel).astype(img.dtype)
+  img = scipy.ndimage.morphology.binary_erosion(img, structure=kernel).astype(img.dtype)
   # save image
   return img
 
@@ -53,7 +54,7 @@ def boundary_box_area(bbox: t.Tuple[object, object]) -> int:
   Returns:
       int: The area of the boundary box
   """
-  return (bbox[0].stop - bbox[0].start) * (bbox[1].stop - bbox[1].start)
+  return abs(bbox[0].stop - bbox[0].start) * abs(bbox[1].stop - bbox[1].start)
 
 def rect_area(rect: t.Tuple[int, int, int, int]) -> int:
   """Calculate the area of a rectangle.
@@ -64,9 +65,9 @@ def rect_area(rect: t.Tuple[int, int, int, int]) -> int:
   Returns:
       int: The area of the rectangle
   """
-  return (rect[2] - rect[0]) * (rect[3] - rect[1])
+  return abs(rect[2] - rect[0]) * abs(rect[3] - rect[1])
 
-def measure_bright_box(mask: np.ndarray) -> int:
+def measure_bright_box(mask: np.ndarray) -> t.Tuple[int, np.ndarray]:
   """Measure the area of the largest shape in the given mask.
 
   Args:
@@ -74,6 +75,7 @@ def measure_bright_box(mask: np.ndarray) -> int:
 
   Returns:
       int: The area of the boundary box of largest shape in the given mask
+      np.ndarray: The
   """
   labels, n = scipy.ndimage.measurements.label(mask, np.ones((3, 3)))
   # get the bounding boxes of the bright boxes
@@ -82,5 +84,9 @@ def measure_bright_box(mask: np.ndarray) -> int:
     return 0
   # get the largest bounding box
   largest_bbox = max(bboxes, key=lambda bbox: boundary_box_area(bbox))
+  largest_bbox_area = boundary_box_area(largest_bbox)
+  # render boxes outline to new image in green
+  img = np.zeros((mask.shape[0], mask.shape[1], 3), np.uint8)
+  img[labels == 1] = [0, 255, 0]
   # return the area of the largest bounding box
-  return boundary_box_area(largest_bbox)
+  return largest_bbox_area,img
