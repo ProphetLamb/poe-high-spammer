@@ -160,7 +160,8 @@ class Application():
 
     # update the threshold based on the area
     # use 90% of the area rounded down to a multiple of 100 to avoid false positives
-    thres = int((area * .9) / 100) * 100
+    thres = int((area * .95) / 100) * 100
+    self.threshold_entry.delete(0, END)
     self.threshold_entry.insert(0, str(thres))
     self.on_threshold_change(None)
 
