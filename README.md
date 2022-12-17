@@ -1,12 +1,15 @@
+![Banner](img/banner.png)
 # POE High Spammer
 
-## Step 0: Start app
+## How to use
+
+### Step 0: Start app
 
 Install python, then install `scipy`, `numpy`, `pynput`, `pyautogui` using pip.
 
 Start the app (`python.exe ./main.py`)
 
-## Step 1: Select target
+### Step 1: Select target
 
 1. In a stash-tab, place your target item.
 2. In the "highlight items" search box, enter a filter which highlights the item (e.g. "glove").
@@ -14,18 +17,21 @@ Start the app (`python.exe ./main.py`)
 
 ![Select target area](img/select-target.png)
 
-## Step 2: Configure threshold
+### Step 2: Configure threshold
+| Note                                                           |
+| -------------------------------------------------------------- |
+| This is guessed automatically and doesnt need to be configured |
 
 1. read the pixel value in "largest rec #px"
 2. adjust area threshold to a slightly lower value
 
 ![Configure area threshold](img/configure-threshold.png)
 
-## Step 3: Set hotkey
+### Step 3: Set hotkey
 
 Press the "edit" button and then any single key, that should toggle the tool, press "stop"..
 
-## Step 4: Prepare for action
+### Step 4: Prepare for action
 
 First adjust the filter in the "highlight items" search box to your target, be strict surround the query with quotes, and use the modifier name if possible.s
 
@@ -38,3 +44,9 @@ In this example we want to alt spam any life roll on our gloves, so we hold [SHI
 Now press the hotkey [COLON].
 
 The autoclicker will reroll until the item is highlighted. This also works with influenced/animated items.
+
+### Dont's
+
+Ensure your cursor doesnt obscure the box while spamming. Consider setting the cursor size to small in the options.
+
+![Cursor obscure box boundary](img/cursor-obscure-box.png)
