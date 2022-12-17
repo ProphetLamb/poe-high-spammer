@@ -4,11 +4,21 @@ from tkinter import *
 import pyautogui
 import scipy.ndimage
 import scipy
-import imageio
+from imageio import imwrite
+from itertools import product
 import numpy as np
 from pynput import keyboard, mouse
 import random
 from PIL import Image, ImageTk
+
+def get_cross_kernel(size: int) -> np.ndarray:
+  kernel = np.zeros((size, size), np.uint8)
+  # cross shaped kernel
+  half = size // 2
+  for x,y in product(range(size), range(size)):
+      if x == half or y == half:
+          kernel[x,y] = 1
+  return kernel
 
 def masked_screenshot(region: tuple) -> np.ndarray:
   """Take a screenshot of the given region and apply some processing to it.
@@ -26,14 +36,9 @@ def masked_screenshot(region: tuple) -> np.ndarray:
   # now the dark box will be 0, and the bright box will be 255, which can easily be detected using the scipy.ndimage.morphology
   img = (img > 180) * 255
   # finally apply dilation and erosion to complete possible holes in the bright box border
-  kernel = np.ones((3, 3), np.uint8)
-  # cross shaped kernel
-  kernel[0, 0] = 0
-  kernel[0, 2] = 0
-  kernel[2, 0] = 0
-  kernel[2, 2] = 0
-  img = scipy.ndimage.morphology.binary_dilation(img, structure=kernel).astype(img.dtype)
-  img = scipy.ndimage.morphology.binary_erosion(img, structure=kernel).astype(img.dtype)
+  img = scipy.ndimage.morphology.binary_dilation(img, structure=cross_kernel).astype(img.dtype)
+  img = scipy.ndimage.morphology.binary_erosion(img, structure=cross_kernel).astype(img.dtype)
+  imwrite("test.png", img)
   # save image
   return img
 
@@ -331,6 +336,8 @@ class Application():
 
 if __name__ == '__main__':
   mouse_sim = mouse.Controller()
+  cross_kernel = get_cross_kernel(5)
+
   root = Tk()
 
   root.resizable(width=False, height=False)
