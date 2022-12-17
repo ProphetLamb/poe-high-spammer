@@ -54,8 +54,9 @@ class Application():
     self.hotkey_listener = None
     self.spammer_active = False
 
-    root.geometry('400x400+200+200')  # set new geometry
+    root.geometry('400x200+200+200')  # set new geometry
     root.title('POE High Spammer')
+    root.iconbitmap("./img/logo.ico")
 
     # menu frame
     self.menu_frame = Frame(master)
