@@ -55,6 +55,7 @@ class Application():
     self.threshold_entry.pack(side="right", fill="y")
     self.threshold_entry.insert(0, "4000")
     self.threshold_entry.bind("<Tab>", self.on_threshold_change)
+    self.threshold_entry.bind("<FocusOut>", self.on_threshold_change)
 
     # auto-clicker
     Label(self.menu_frame, text="spammer").pack(side="top", fill="x")
@@ -118,7 +119,7 @@ class Application():
     img_area = pow(img.shape[0] * img.shape[1],.5)
     fill_ratio = box_area / float(img_area)
 
-    self.select_lbl["text"] = "{}found {} in {} ({:2.2f}%)".format("" if fill_ratio > .75 else "LOW CERTAINTY ", int(box_area), int(img_area), fill_ratio * 100)
+    self.select_lbl["text"] = "{}found {}px in {}px ({:2.2f}%)".format("" if fill_ratio > .75 else "LOW CERTAINTY ", int(box_area), int(img_area), fill_ratio * 100)
     if fill_ratio > .75:
       self.select_lbl["fg"] = "black"
     else:
@@ -126,7 +127,7 @@ class Application():
 
     # update the threshold based on the area
     # use 90% of the area rounded down to a multiple of 100 to avoid false positives
-    thres = int((box_area * .95) / 100) * 100
+    thres = int(box_area * .95)
     self.threshold_entry.delete(0, END)
     self.threshold_entry.insert(0, str(thres))
     self.on_threshold_change(None)
@@ -262,7 +263,7 @@ class Application():
   def spam_once(self):
     # check whether the selected region exceeds the threshold
     img = masked_screenshot(self.select_region, self.cross_kernel)
-    area = measure_bright_box(img)
+    area = pow(measure_bright_box(img),.5)
     if area > self.select_threshold:
       self.exit_spam_mode()
     else:
