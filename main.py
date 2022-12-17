@@ -33,6 +33,8 @@ def measure_bright_box(mask: np.ndarray) -> int:
   labels, n = scipy.ndimage.measurements.label(mask, np.ones((3, 3)))
   # get the bounding boxes of the bright boxes
   bboxes = scipy.ndimage.measurements.find_objects(labels)
+  if len(bboxes) == 0:
+    return 0
   # get the largest bounding box
   largest_bbox = max(bboxes, key=lambda bbox: (bbox[0].stop - bbox[0].start) * (bbox[1].stop - bbox[1].start))
   # return the area of the largest bounding box
