@@ -4,6 +4,7 @@ from tkinter import *
 import pyautogui
 import scipy.ndimage
 import scipy
+import imageio
 import numpy as np
 from pynput import keyboard, mouse
 import random
@@ -21,13 +22,20 @@ def masked_screenshot(region: tuple) -> np.ndarray:
   img = np.array(img.convert('L'))
   # apply thresholding
   # the dark box will turn bright if its a match, so we ought to remove the dark, but keep the bright over the thresholdm
-  # the theshold is 100, so anything below 100 will be set to 0, anything above 100 will be set to 255
+  # the theshold is around 180, so anything below 180 will be set to 0, anything above that will be set to 255
   # now the dark box will be 0, and the bright box will be 255, which can easily be detected using the scipy.ndimage.morphology
-  img = (img > 100) * 255
-  # finally apply dilation and erosion to remove some noise
-  kernel = np.ones((2, 2), np.uint8)
+  img = (img > 180) * 255
+  # finally apply dilation and erosion to complete possible holes in the bright box border
+  kernel = np.ones((3, 3), np.uint8)
+  # cross shaped kernel
+  kernel[0, 0] = 0
+  kernel[0, 2] = 0
+  kernel[2, 0] = 0
+  kernel[2, 2] = 0
   img = scipy.ndimage.morphology.binary_dilation(img, structure=kernel).astype(img.dtype)
   img = scipy.ndimage.morphology.binary_erosion(img, structure=kernel).astype(img.dtype)
+  imageio.imwrite("demo-close.png", img)
+  # save image
   return img
 
 def measure_bright_box(mask: np.ndarray) -> int:
@@ -148,7 +156,7 @@ class Application():
     img = masked_screenshot(self.select_region)
     area = measure_bright_box(img)
 
-    self.select_lbl["text"] = "largest rect {}px".format(area)
+    self.select_lbl["text"] = "largest rect {}px^2".format(area)
 
     # update the threshold based on the area
     # use 90% of the area rounded down to a multiple of 100 to avoid false positives
