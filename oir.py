@@ -67,7 +67,7 @@ def rect_area(rect: t.Tuple[int, int, int, int]) -> int:
   """
   return abs(rect[2] - rect[0]) * abs(rect[3] - rect[1])
 
-def measure_bright_box(mask: np.ndarray) -> int:
+def measure_bright_box(mask: np.ndarray) -> t.Tuple[int, t.List[tuple]]:
   """Measure the area of the largest shape in the given mask.
 
   Args:
@@ -75,15 +75,15 @@ def measure_bright_box(mask: np.ndarray) -> int:
 
   Returns:
       int: The area of the boundary box of largest shape in the given mask
-      np.ndarray: The
+      t.List[tuple]: The boundary boxes of all the shapes in the given mask
   """
   labels, n = scipy.ndimage.measurements.label(mask, np.ones((3, 3)))
   # get the bounding boxes of the bright boxes
-  bboxes: list = scipy.ndimage.measurements.find_objects(labels)
+  bboxes: t.List[tuple] = scipy.ndimage.measurements.find_objects(labels)
   if len(bboxes) == 0:
     return 0
   # get the largest bounding box
   largest_bbox = max(bboxes, key=lambda bbox: boundary_box_area(bbox))
   largest_bbox_area = boundary_box_area(largest_bbox)
   # return the area of the largest bounding box
-  return largest_bbox_area
+  return pow(largest_bbox_area,.5), bboxes

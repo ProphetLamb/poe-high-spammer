@@ -6,6 +6,8 @@ from pynput import keyboard, mouse
 import random
 from PIL import Image, ImageTk
 from oir import masked_screenshot, measure_bright_box, get_cross_kernel
+import numpy as np
+import typing as t
 
 class Application():
   def __init__(self, master):
@@ -75,8 +77,7 @@ class Application():
     self.spammer_lbl.pack(side=RIGHT, fill=Y)
 
     # preview
-
-    self.preview_lbl = Label(self.menu_frame, text="preview", bg="white")
+    self.preview_lbl = Label(self.menu_frame, text="preview", bg="black")
     self.preview_lbl.pack(side=TOP, fill=BOTH, expand=YES)
 
     # selector overlay
@@ -120,7 +121,20 @@ class Application():
   def set_select(self, x1, y1, x2, y2):
     self.select_region = (x1, y1, x2, y2)
     img = masked_screenshot(self.select_region, self.cross_kernel)
-    box_area = pow(measure_bright_box(img),.5)
+    box_area,bboxes = measure_bright_box(img)
+
+    self.update_select_lbl(img, box_area)
+    self.update_preview_lbl(img, bboxes)
+    self.update_threshold(box_area)
+
+  def update_threshold(self, box_area: float):
+    # use 90% of the area rounded down to a multiple of 100 to avoid false positives
+    thres = int(box_area * .95)
+    self.threshold_entry.delete(0, END)
+    self.threshold_entry.insert(0, str(thres))
+    self.on_threshold_change(None)
+
+  def update_select_lbl(self, img: np.ndarray, box_area: float):
     img_area = pow(img.shape[0] * img.shape[1],.5)
     fill_ratio = box_area / float(img_area)
 
@@ -130,12 +144,16 @@ class Application():
     else:
       self.select_lbl["fg"] = "red"
 
-    # update the threshold based on the area
-    # use 90% of the area rounded down to a multiple of 100 to avoid false positives
-    thres = int(box_area * .95)
-    self.threshold_entry.delete(0, END)
-    self.threshold_entry.insert(0, str(thres))
-    self.on_threshold_change(None)
+  def update_preview_lbl(self, img: np.ndarray, bboxes: t.List[tuple]):
+    img = np.dstack((img,) * 3)
+    for y,x in bboxes:
+      img[(y.start,y.stop-1),x]=(0,255,0)
+      img[y,(x.start,x.stop-1)]=(0,255,0)
+
+    img = Image.fromarray(img.astype(np.uint8))
+    img_wg = ImageTk.PhotoImage(img)
+    self.preview_lbl.configure(image=img_wg)
+    self.preview_lbl.image = img_wg
 
   def on_select_button_release(self, event):
     if self.start_x <= self.current_x and self.start_y <= self.current_y:
@@ -269,7 +287,7 @@ class Application():
   def spam_once(self):
     # check whether the selected region exceeds the threshold
     img = masked_screenshot(self.select_region, self.cross_kernel)
-    area = pow(measure_bright_box(img),.5)
+    area,_ = measure_bright_box(img)
     if area > self.select_threshold:
       self.exit_spam_mode()
     else:
