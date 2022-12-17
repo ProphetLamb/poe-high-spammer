@@ -77,7 +77,8 @@ class Application():
     self.spammer_lbl.pack(side=RIGHT, fill=Y)
 
     # preview
-    self.preview_lbl = Label(self.menu_frame, text="preview", bg="black")
+    Label(self.menu_frame, text="preview", bg="black", fg="white").pack(side=TOP, fill=X)
+    self.preview_lbl = Label(self.menu_frame, bg="black")
     self.preview_lbl.pack(side=TOP, fill=BOTH, expand=YES)
 
     # selector overlay
@@ -145,12 +146,24 @@ class Application():
       self.select_lbl["fg"] = "red"
 
   def update_preview_lbl(self, img: np.ndarray, bboxes: t.List[tuple]):
+    # img is a openCV image with 1 channel and values between 0 and 255
+    # we need to convert it to a PIL image with 3 channels and values between 0 and 255m
+    img = np.multiply(img, 255).astype(np.uint8)
     img = np.dstack((img,) * 3)
-    for y,x in bboxes:
+    # render bounding boxes to the image
+    if len(bboxes) > 0:
+      # first box in green
+      y,x = bboxes[0]
       img[(y.start,y.stop-1),x]=(0,255,0)
       img[y,(x.start,x.stop-1)]=(0,255,0)
+      for y,x in bboxes[1:]:
+        # other boxes in teal
+        img[(y.start,y.stop-1),x]=(0,110,135)
+        img[y,(x.start,x.stop-1)]=(0,110,135)
 
-    img = Image.fromarray(img.astype(np.uint8))
+    img = Image.fromarray(img)
+    # fix height to 200px
+    img = img.resize((int(img.size[0] * 250 / img.size[1]), 250), Image.ANTIALIAS)
     img_wg = ImageTk.PhotoImage(img)
     self.preview_lbl.configure(image=img_wg)
     self.preview_lbl.image = img_wg

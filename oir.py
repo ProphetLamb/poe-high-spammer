@@ -40,8 +40,8 @@ def masked_screenshot(region: tuple, kernel: np.ndarray) -> np.ndarray:
   # now the dark box will be 0, and the bright box will be 255, which can easily be detected using the scipy.ndimage.morphology
   img = (img > 180) * 255
   # finally apply dilation and erosion to complete possible holes in the bright box border
-  img = scipy.ndimage.morphology.binary_dilation(img, structure=kernel).astype(img.dtype)
-  img = scipy.ndimage.morphology.binary_erosion(img, structure=kernel).astype(img.dtype)
+  img = scipy.ndimage.morphology.binary_dilation(img, structure=kernel, iterations=3).astype(img.dtype)
+  img = scipy.ndimage.morphology.binary_erosion(img, structure=kernel, iterations=3).astype(img.dtype)
   # save image
   return img
 
@@ -81,9 +81,9 @@ def measure_bright_box(mask: np.ndarray) -> t.Tuple[int, t.List[tuple]]:
   # get the bounding boxes of the bright boxes
   bboxes: t.List[tuple] = scipy.ndimage.measurements.find_objects(labels)
   if len(bboxes) == 0:
-    return 0
-  # get the largest bounding box
-  largest_bbox = max(bboxes, key=lambda bbox: boundary_box_area(bbox))
+    return 0, bboxes
+  bboxes.sort(key=lambda bbox: boundary_box_area(bbox), reverse=True)
+  largest_bbox = bboxes[0]
   largest_bbox_area = boundary_box_area(largest_bbox)
   # return the area of the largest bounding box
   return pow(largest_bbox_area,.5), bboxes
