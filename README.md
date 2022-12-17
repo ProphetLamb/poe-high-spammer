@@ -25,13 +25,13 @@ This tool uses the same method. We listen to mouse scrolls and count the number 
 
 To detect a highlighted item the tool applies filters to a specified screenshot region. The goal is to detect the bright border around a highlighted item using optical image recognition.
 
-1. Take gray-scale screenshot <br/> ![Region in grayscale](img/demo-gray.png)
+1. Take gray-scale screenshot. <br/> ![Region in grayscale](img/demo-gray.png)
 
-2. Apply thresholding to only "see" bright features <br/> ![Region with thresholding](img/demo-thres.png)
+2. Apply thresholding to only "see" bright features. <br/> ![Region with thresholding](img/demo-thres.png)
 
-3. Apply closing with a cross kernel to the image <br/> ![Region with closing](img/demo-close.png)
+3. Apply closing with a cross kernel to the image. <br/> ![Region with closing](img/demo-close.png)
 
-4. Label major features in the image <br/> ![Region with boxes](img/demo-boxed.png) <br/> This image has the known feature coordinates rendered in green.
+4. Label major features in the image. <br/> ![Region with boxes](img/demo-boxed.png) <br/> This image has the known feature coordinates rendered in green.
 
 Now we simply calculate the area for the largest feature, which we assume is the box. In this case the area is 25651px^2, and compare it to the "area threshold" 23000px^2. If the area exceeds the threshold, then the box is highlighted.
 
@@ -56,6 +56,7 @@ Start the app (`python.exe ./main.py`)
 ![Select target area](img/select-target.png)
 
 ### Step 2: Configure threshold
+
 | Note                                                           |
 | -------------------------------------------------------------- |
 | This is guessed automatically and doesnt need to be configured |
