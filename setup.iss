@@ -8,7 +8,9 @@ UninstallDisplayIcon={app}\PoE High Spammer.exe
 LicenseFile=LICENSE
 Compression=lzma2
 SolidCompression=yes
-OutputDir=userdocs:Inno Setup Examples Output
+SetupIconFile=img\logo.ico
+OutputDir=dist
+OutputBaseFilename=PoE High Spammer - Setup
 ; "ArchitecturesAllowed=x64" specifies that Setup cannot run on
 ; anything but x64.
 ArchitecturesAllowed=x64
@@ -18,7 +20,7 @@ ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
-Source: "dist/PoE High Spammer.exe"; DestDir: "{app}"; DestName: "PoE High Spammer.exe"
+Source: "dist\PoE High Spammer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 Source: "README.txt"; DestDir: "{app}"; Flags: isreadme
 
 [Icons]
