@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
 from tkinter import *
 import pyautogui
 import scipy.ndimage
@@ -337,19 +338,22 @@ def main():
   global mouse_sim,cross_kernel,root,app
   mouse_sim = mouse.Controller()
   cross_kernel = get_cross_kernel(5)
-
   root = Tk()
 
+  WIDTH, HEIGHT = 400, 350
   root.resizable(width=False, height=False)
-  root.geometry('400x320+200+200')
+  root.geometry('{}x{}+200+200'.format(WIDTH, HEIGHT))
   root.title('PoE High Spammer')
   root.iconbitmap("./img/logo.ico")
 
-  banner = Image.open("./img/banner.png").resize((400, 134), Image.ANTIALIAS)
+  banner = Image.open("./img/banner.png")
+  banner = banner.resize((WIDTH, int(WIDTH * banner.height / banner.width)), Image.ANTIALIAS)
   banner = ImageTk.PhotoImage(banner)
   Label(root, image=banner).pack()
 
   app = Application(root)
+
+  Label(root, text="Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>").pack(side="bottom", fill="x")
   root.mainloop()
 
 if __name__ == '__main__':
