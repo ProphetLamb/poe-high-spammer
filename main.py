@@ -333,7 +333,8 @@ class Application():
     else:
       mouse_sim.click(mouse.Button.left)
 
-if __name__ == '__main__':
+def main():
+  global mouse_sim,cross_kernel,root,app
   mouse_sim = mouse.Controller()
   cross_kernel = get_cross_kernel(5)
 
@@ -341,7 +342,7 @@ if __name__ == '__main__':
 
   root.resizable(width=False, height=False)
   root.geometry('400x320+200+200')
-  root.title('POE High Spammer')
+  root.title('PoE High Spammer')
   root.iconbitmap("./img/logo.ico")
 
   banner = Image.open("./img/banner.png").resize((400, 134), Image.ANTIALIAS)
@@ -350,3 +351,6 @@ if __name__ == '__main__':
 
   app = Application(root)
   root.mainloop()
+
+if __name__ == '__main__':
+  main()
