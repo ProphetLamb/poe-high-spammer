@@ -34,7 +34,6 @@ def masked_screenshot(region: tuple) -> np.ndarray:
   kernel[2, 2] = 0
   img = scipy.ndimage.morphology.binary_dilation(img, structure=kernel).astype(img.dtype)
   img = scipy.ndimage.morphology.binary_erosion(img, structure=kernel).astype(img.dtype)
-  imageio.imwrite("demo-close.png", img)
   # save image
   return img
 
@@ -67,7 +66,7 @@ class Application():
     self.queued_scroll = 0
 
     # menu frame
-    self.menu_frame = Frame(master)
+    self.menu_frame = Frame(master, bg="white")
     self.menu_frame.pack(side="top", fill="x")
 
     # selection
@@ -75,15 +74,15 @@ class Application():
     # selection ui
     select = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
     select.pack(side="top", fill="x")
-    Label(select, text="select area").pack(side="left", fill="y")
+    Label(select, text="select area", bg="white").pack(side="left", fill="y")
     self.select_btn = Button(select, command=self.enter_select_mode, text="region")
     self.select_btn.pack(side="right", fill="y")
-    self.select_lbl = Label(select, text="")
+    self.select_lbl = Label(select, text="none", bg="white")
     self.select_lbl.pack(side="right", fill="y")
     # selection threshold
     threshold = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
     threshold.pack(side="top", fill="x")
-    Label(threshold, text="area threshold").pack(side="left", fill="y")
+    Label(threshold, text="area threshold", bg="white").pack(side="left", fill="y")
     # numeric threshold input which sets self.select_threshold
     self.threshold_entry = Entry(threshold, width=5)
     self.threshold_entry.pack(side="right", fill="y")
@@ -95,16 +94,16 @@ class Application():
     # hotkey
     hotkey = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
     hotkey.pack(side="top", fill="x")
-    Label(hotkey, text="hotkey").pack(side="left", fill="y")
+    Label(hotkey, text="hotkey", bg="white").pack(side="left", fill="y")
     self.hotkey_edit_btn = Button(hotkey, command=self.enter_hotkey_mode, text="edit")
     self.hotkey_edit_btn.pack(side="right", fill="y")
-    self.hotkey_edit_label = Label(hotkey, text="None")
+    self.hotkey_edit_label = Label(hotkey, text="none", bg="white")
     self.hotkey_edit_label.pack(side="right", fill="y")
     # spammer
     spammer = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
     spammer.pack(side="top", fill="x")
-    Label(spammer, text="spammer").pack(side="left", fill="y")
-    self.spammer_lbl = Label(spammer, text="inactive", fg="red")
+    Label(spammer, text="spammer", bg="white").pack(side="left", fill="y")
+    self.spammer_lbl = Label(spammer, text="inactive", fg="red", bg="white")
     self.spammer_lbl.pack(side="right", fill="y")
     # legal mode
     # legal = Frame(self.menu_frame, height=5, bg="")
