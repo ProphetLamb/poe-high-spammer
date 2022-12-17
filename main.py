@@ -126,6 +126,12 @@ class Application():
 
     self.select_lbl["text"] = "largest rect {}px".format(area)
 
+    # update the threshold based on the area
+    # use 90% of the area rounded down to a multiple of 100 to avoid false positives
+    thres = int((area * .9) / 100) * 100
+    self.threshold_entry.insert(0, str(thres))
+    self.on_threshold_change(None)
+
   def on_select_button_release(self, event):
     if self.start_x <= self.current_x and self.start_y <= self.current_y:
       self.set_select(self.start_x, self.start_y, self.current_x - self.start_x, self.current_y - self.start_y)
