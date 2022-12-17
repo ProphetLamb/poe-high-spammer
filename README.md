@@ -6,7 +6,7 @@ At its core it remaps the scroll wheel input to left clicks, a maximum of one ac
 
 After each reroll ("spamming") the tool checks, if the current filter highlights the item. If so it prevents over-rolling the highlighted state even if the user continuously scrolls.
 
-![Showcase](img/showcase-1.png)
+![Showcase](img/showcase.png)
 
 ## Legality
 
