@@ -23,10 +23,19 @@ class Application():
     self.legal_mode = True
     self.scroll_listener = None
     self.queued_scroll = 0
+    self.mouse_sim = mouse.Controller()
+    self.cross_kernel = get_cross_kernel(5)
+
+    banner = Image.open("./img/banner.png")
+    banner = banner.resize((WIDTH, int(WIDTH * banner.height / banner.width)), Image.ANTIALIAS)
+    banner_wd = ImageTk.PhotoImage(banner)
+    lbl=Label(root, image=banner_wd)
+    lbl.image = banner_wd
+    lbl.pack()
 
     # menu frame
     self.menu_frame = Frame(master, bg="white")
-    self.menu_frame.pack(side="top", fill="x")
+    self.menu_frame.pack(side="top", fill="x", expand='yes')
 
     # selection
     Label(self.menu_frame, text="selection").pack(side="top", fill="x")
@@ -111,14 +120,16 @@ class Application():
 
   def set_select(self, x1, y1, x2, y2):
     self.select_region = (x1, y1, x2, y2)
-    img = masked_screenshot(self.select_region)
-    area = measure_bright_box(img)
+    img = masked_screenshot(self.select_region, self.cross_kernel)
+    box_area = measure_bright_box(img)
+    img_area = img.shape[0] * img.shape[1]
+    fill_ratio = box_area / float(img_area) * 100
 
-    self.select_lbl["text"] = "largest rect {}px^2".format(area)
+    self.select_lbl["text"] = "found {}px² in {}px² ({:2.2f}%)".format(box_area, img_area, fill_ratio)
 
     # update the threshold based on the area
     # use 90% of the area rounded down to a multiple of 100 to avoid false positives
-    thres = int((area * .95) / 100) * 100
+    thres = int((box_area * .95) / 100) * 100
     self.threshold_entry.delete(0, END)
     self.threshold_entry.insert(0, str(thres))
     self.on_threshold_change(None)
@@ -281,29 +292,22 @@ class Application():
 
   def spam_once(self):
     # check whether the selected region exceeds the threshold
-    img = masked_screenshot(self.select_region)
+    img = masked_screenshot(self.select_region, self.cross_kernel)
     area = measure_bright_box(img)
     if area > self.select_threshold:
       self.exit_spam_mode()
     else:
-      mouse_sim.click(mouse.Button.left)
+      self.mouse_sim.click(mouse.Button.left)
 
 def main():
-  global mouse_sim,cross_kernel,root,app
-  mouse_sim = mouse.Controller()
-  cross_kernel = get_cross_kernel(5)
+  global root,app,WIDTH,HEIGHT
   root = Tk()
 
-  WIDTH, HEIGHT = 400, 350
+  WIDTH, HEIGHT = 400, 600
   root.resizable(width=False, height=False)
   root.geometry('{}x{}+200+200'.format(WIDTH, HEIGHT))
   root.title('PoE High Spammer')
   root.iconbitmap("./img/logo.ico")
-
-  banner = Image.open("./img/banner.png")
-  banner = banner.resize((WIDTH, int(WIDTH * banner.height / banner.width)), Image.ANTIALIAS)
-  banner = ImageTk.PhotoImage(banner)
-  Label(root, image=banner).pack()
 
   app = Application(root)
 
