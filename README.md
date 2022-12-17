@@ -35,6 +35,10 @@ To detect a highlighted item the tool applies filters to a specified screenshot 
 
 Now we simply calculate the area for the largest feature, which we assume is the box. In this case the area is 25651px^2, and compare it to the "area threshold" 23000px^2. If the area exceeds the threshold, then the box is highlighted.
 
+Comparing the highlighted to the non highlighted item below, we can clearly see that the border is missing. Calculating the largest area we obtain 100px^2 which is far below the "area threshold".
+
+![Not hightlighted region](img/demo-no-highlight.png)
+
 ## How to use
 
 ### Step 0: Start app
