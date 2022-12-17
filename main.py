@@ -120,6 +120,16 @@ class Application():
     self.master_screen.attributes('-alpha', .3)
     self.master_screen.lift()
     self.master_screen.attributes("-topmost", True)
+    self.master_screen.bind("<Escape>", self.on_select_cancel)
+
+  def exit_select_mode(self):
+    self.snip_surface.destroy()
+    self.master_screen.unbind("<Escape>")
+    self.master_screen.withdraw()
+    root.deiconify()
+
+  def on_select_cancel(self, event):
+    self.exit_select_mode()
 
   def set_select(self, x1, y1, x2, y2):
     self.select_region = (x1, y1, x2, y2)
@@ -149,11 +159,6 @@ class Application():
 
     self.exit_select_mode()
     return event
-
-  def exit_select_mode(self):
-    self.snip_surface.destroy()
-    self.master_screen.withdraw()
-    root.deiconify()
 
   def on_select_button_press(self, event):
     # save mouse drag start position
