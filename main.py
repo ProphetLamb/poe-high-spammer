@@ -102,11 +102,11 @@ class Application():
     self.spammer_lbl = Label(spammer, text="inactive", fg="red")
     self.spammer_lbl.pack(side="right", fill="y")
     # legal mode
-    legal = Frame(self.menu_frame, height=5, bg="")
-    legal.pack(side="top", fill="x")
-    Label(legal, text="legal mode").pack(side="left", fill="y")
-    self.legal_btn = Button(legal, command=self.toggle_legal_mode, text="on")
-    self.legal_btn.pack(side="right", fill="y")
+    # legal = Frame(self.menu_frame, height=5, bg="")
+    # legal.pack(side="top", fill="x")
+    # Label(legal, text="legal mode").pack(side="left", fill="y")
+    # self.legal_btn = Button(legal, command=self.toggle_legal_mode, text="on")
+    # self.legal_btn.pack(side="right", fill="y")
 
     # selector overlay
     self.master_screen = Toplevel(root)
