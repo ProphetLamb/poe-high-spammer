@@ -130,6 +130,7 @@ class Application():
 
   def on_select_cancel(self, event):
     self.exit_select_mode()
+    return event
 
   def set_select(self, x1, y1, x2, y2):
     self.select_region = (x1, y1, x2, y2)
@@ -165,15 +166,17 @@ class Application():
     self.start_x = self.snip_surface.canvasx(event.x)
     self.start_y = self.snip_surface.canvasy(event.y)
     self.snip_surface.create_rectangle(0, 0, 1, 1, outline='red', width=3, fill="maroon3")
+    return event
 
   def on_select_drag(self, event):
     self.current_x, self.current_y = (event.x, event.y)
     # expand rectangle as you drag the mouse
     self.snip_surface.coords(1, self.start_x, self.start_y, self.current_x, self.current_y)
+    return event
 
   def on_threshold_change(self, event):
     self.select_threshold = int(self.threshold_entry.get())
-    print(self.select_threshold)
+    return event
 
   def enter_hotkey_mode(self):
     self.hotkey_edit_btn["text"] = "stop"
@@ -198,6 +201,7 @@ class Application():
     # unbind previous from master
     self.hotkey_keycode = event.keycode
     self.hotkey_edit_label["text"] = event.keysym
+    return event
 
 
   def on_spammer_triggered(self, event):
@@ -208,6 +212,7 @@ class Application():
         self.exit_spam_mode()
       else:
         self.enter_spam_mode()
+    return event
 
   def enter_spam_mode(self):
     self.spammer_lbl["text"] = "active"
