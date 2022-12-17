@@ -1,5 +1,39 @@
 ![Banner](img/banner.png)
-# POE High Spammer
+# PoE High Spammer
+
+PoE High Spammer is a crafting tool for the game Path of Exile.
+At its core it remaps the scroll wheel input to left clicks, a maximum of one action in game is taken per scroll action.
+
+After each reroll ("spamming") the tool checks, if the current filter highlights the item. If so it prevents over-rolling the highlighted state even if the user continuously scrolls.
+
+## Legality
+
+The [terms of use](https://www.pathofexile.com/legal/terms-of-use-and-privacy-policy) section 7 restrict tool usage for the game. Many crafting tools such as auto-clickers are prohibited by section c:
+> 7. Restrictions: Under no circumstances, without the prior written approval of Grinding Gear Games, may you:
+> [...]
+> c. Utilise any automated software or 'bots' in relation to your access or use of the Website, Materials or Services.
+
+To circumvent this limitation it is common to remap left-click to the scroll-wheel to quickly move inventories. This method is [officially approved](https://www.reddit.com/r/pathofexile/comments/8y5cay/in_light_of_the_recent_build_of_the_week_video/) by the path of exile Support. Please note that this standpoint can change at any time.
+
+> It seems that, to be fully "ethical" (i.e. no breaching of Terms of Service), you need to make sure you're using a mouse-wheel that doesn't spin on its own, i.e. 1 finger movement = 1 key-press.
+
+> As for how to actually do it, it seems most commonly if you have a gaming mouse it should come with a control panel software that lets you rebind what mouse buttons do, but I don't think I have that personally, so you'd probably want to look into using AutoHotkey. As GGG tells us that anything that goes beyond 1 click or button-press = 1 server-side action is a ban-able offense, you shouldn't need to learn anything too sophisticated to set up a simple key rebind with AutoHotkey.
+
+This tool uses the same method. We listen to mouse scrolls and count the number of scrolls. This queue of user-actions is then drained one-by-one, so that we have a maximum of one server-action per user-action.
+
+## Detection method
+
+To detect a highlighted item the tool applies filters to a specified screenshot region. The goal is to detect the bright border around a highlighted item using optical image recognition.
+
+1. Take gray-scale screenshot <br/> ![Region in grayscale](img/demo-gray.png)
+
+2. Apply thresholding to only "see" bright features <br/> ![Region with thresholding](img/demo-thres.png)
+
+3. Apply closing with a cross kernel to the image <br/> ![Region with closing](img/demo-close.png)
+
+4. Label major features in the image <br/> ![Region with boxes](img/demo-boxed.png) <br/> This image has the known feature coordinates rendered in green.
+
+Now we simply calculate the area for the largest feature, which we assume is the box. In this case the area is 25651px^2, and compare it to the "area threshold" 23000px^2. If the area exceeds the threshold, then the box is highlighted.
 
 ## How to use
 
@@ -37,13 +71,14 @@ First adjust the filter in the "highlight items" search box to your target, be s
 
 Once the hotkey is toggled the auto-clicker will simulate a mouse left click, until the item is highlighted.
 For this it is important that the box which your item is within is not obscured by the info panel.
-To ensure this doesnt happen hold the [ALT] key.
-To repeatedly use currency hold the [SHIFT] key.
+To ensure this doesnt happen hold the `[ALT]` key.
+To repeatedly use currency hold the `[SHIFT]` key.
 
-In this example we want to alt spam any life roll on our gloves, so we hold [SHIFT]+[ALT] and hover over the item, so that the cursor does not overlay the edge of the item-boundary-box (which is used for detecting the match).
-Now press the hotkey [COLON].
+In this example we want to alt spam any life roll on our gloves, so we hold `[SHIFT]+[ALT]` and hover over the item, so that the cursor does not overlay the edge of the item-boundary-box (which is used for detecting the match).
+Now press the hotkey `[COLON]`.
 
-The autoclicker will reroll until the item is highlighted. This also works with influenced/animated items.
+The spammer will reroll until the item is highlighted. This also works with influenced/animated items.
+Action will only be taken once per scroll, so that the tool exhibits a maximum of 1 server action per 1 input.
 
 ### Dont's
 
