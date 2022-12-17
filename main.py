@@ -7,6 +7,7 @@ import scipy
 import numpy as np
 from pynput import keyboard, mouse
 import random
+from PIL import Image, ImageTk
 
 def masked_screenshot(region: tuple) -> np.ndarray:
   """Take a screenshot of the given region and apply some processing to it.
@@ -57,18 +58,14 @@ class Application():
     self.scroll_listener = None
     self.queued_scroll = 0
 
-    root.geometry('400x200+200+200')  # set new geometry
-    root.title('POE High Spammer')
-    root.iconbitmap("./img/logo.ico")
-
     # menu frame
     self.menu_frame = Frame(master)
-    self.menu_frame.pack(fill=BOTH, expand=YES, padx=1, pady=1)
+    self.menu_frame.pack(side="top", fill="x")
 
     # selection
     Label(self.menu_frame, text="selection").pack(side="top", fill="x")
     # selection ui
-    select = Frame(self.menu_frame, height=5, bg="")
+    select = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
     select.pack(side="top", fill="x")
     Label(select, text="select area").pack(side="left", fill="y")
     self.select_btn = Button(select, command=self.enter_select_mode, text="region")
@@ -76,7 +73,7 @@ class Application():
     self.select_lbl = Label(select, text="")
     self.select_lbl.pack(side="right", fill="y")
     # selection threshold
-    threshold = Frame(self.menu_frame, height=5, bg="")
+    threshold = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
     threshold.pack(side="top", fill="x")
     Label(threshold, text="area threshold").pack(side="left", fill="y")
     # numeric threshold input which sets self.select_threshold
@@ -88,7 +85,7 @@ class Application():
     # auto-clicker
     Label(self.menu_frame, text="spammer").pack(side="top", fill="x")
     # hotkey
-    hotkey = Frame(self.menu_frame, height=5, bg="")
+    hotkey = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
     hotkey.pack(side="top", fill="x")
     Label(hotkey, text="hotkey").pack(side="left", fill="y")
     self.hotkey_edit_btn = Button(hotkey, command=self.enter_hotkey_mode, text="edit")
@@ -96,7 +93,7 @@ class Application():
     self.hotkey_edit_label = Label(hotkey, text="None")
     self.hotkey_edit_label.pack(side="right", fill="y")
     # spammer
-    spammer = Frame(self.menu_frame, height=5, bg="")
+    spammer = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
     spammer.pack(side="top", fill="x")
     Label(spammer, text="spammer").pack(side="left", fill="y")
     self.spammer_lbl = Label(spammer, text="inactive", fg="red")
@@ -327,6 +324,15 @@ class Application():
 if __name__ == '__main__':
   mouse_sim = mouse.Controller()
   root = Tk()
+
   root.resizable(width=False, height=False)
+  root.geometry('400x320+200+200')
+  root.title('POE High Spammer')
+  root.iconbitmap("./img/logo.ico")
+
+  banner = Image.open("./img/banner.png").resize((400, 134), Image.ANTIALIAS)
+  banner = ImageTk.PhotoImage(banner)
+  Label(root, image=banner).pack()
+
   app = Application(root)
   root.mainloop()
