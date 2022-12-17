@@ -292,7 +292,7 @@ class Application():
     """
     if not self.spammer_active:
       return
-    root.after(190 + random.randrange(0, 110), self.spam_legal_loop)
+    root.after(140 + random.randrange(0, 110), self.spam_legal_loop)
     rem_scroll = self.queued_scroll - 1
     if rem_scroll >= 0:
       self.queued_scroll = rem_scroll
