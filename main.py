@@ -38,7 +38,6 @@ def masked_screenshot(region: tuple) -> np.ndarray:
   # finally apply dilation and erosion to complete possible holes in the bright box border
   img = scipy.ndimage.morphology.binary_dilation(img, structure=cross_kernel).astype(img.dtype)
   img = scipy.ndimage.morphology.binary_erosion(img, structure=cross_kernel).astype(img.dtype)
-  imwrite("test.png", img)
   # save image
   return img
 
