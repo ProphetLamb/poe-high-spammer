@@ -291,8 +291,8 @@ class Application():
       self.spam_once()
 
   def on_scroll(self, x, y, dx, dy):
-    # queue scroll action
-    self.queued_scroll += 1
+    # queue scroll actions
+    self.queued_scroll += abs(dx) + abs(dy)
 
   # -----------------------------------------------------------------------------
   # ILLEGAL SPAMMING
