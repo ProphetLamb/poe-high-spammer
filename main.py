@@ -34,45 +34,50 @@ class Application():
 
     # menu frame
     self.menu_frame = Frame(master, bg="white")
-    self.menu_frame.pack(side="top", fill="x")
+    self.menu_frame.pack(side=TOP, fill=X)
 
     # selection
-    Label(self.menu_frame, text="selection").pack(side="top", fill="x")
+    Label(self.menu_frame, text="selection").pack(side=TOP, fill=X)
     # selection ui
-    select = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
-    select.pack(side="top", fill="x")
-    Label(select, text="select area", bg="white").pack(side="left", fill="y")
+    select = Frame(self.menu_frame, height=5, bg="white", padx=5, pady=5)
+    select.pack(side=TOP, fill=X)
+    Label(select, text="select area", bg="white").pack(side=LEFT, fill=Y)
     self.select_btn = Button(select, command=self.enter_select_mode, text="region")
-    self.select_btn.pack(side="right", fill="y")
-    self.select_lbl = Label(select, text="none", bg="white")
-    self.select_lbl.pack(side="right", fill="y")
+    self.select_btn.pack(side=RIGHT, fill=Y)
+    self.select_lbl = Label(select, text="none", bg="white", fg="red")
+    self.select_lbl.pack(side=RIGHT, fill=Y)
     # selection threshold
-    threshold = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
-    threshold.pack(side="top", fill="x")
-    Label(threshold, text="area threshold", bg="white").pack(side="left", fill="y")
+    threshold = Frame(self.menu_frame, height=5, bg="white", padx=5, pady=5)
+    threshold.pack(side=TOP, fill=X)
+    Label(threshold, text="area threshold", bg="white").pack(side=LEFT, fill=Y)
     # numeric threshold input which sets self.select_threshold
     self.threshold_entry = Entry(threshold, width=5)
-    self.threshold_entry.pack(side="right", fill="y")
-    self.threshold_entry.insert(0, "4000")
+    self.threshold_entry.pack(side=RIGHT, fill=Y)
+    self.threshold_entry.insert(0, "300")
     self.threshold_entry.bind("<Tab>", self.on_threshold_change)
     self.threshold_entry.bind("<FocusOut>", self.on_threshold_change)
 
     # auto-clicker
-    Label(self.menu_frame, text="spammer").pack(side="top", fill="x")
+    Label(self.menu_frame, text="spammer").pack(side=TOP, fill=X)
     # hotkey
-    hotkey = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
-    hotkey.pack(side="top", fill="x")
-    Label(hotkey, text="hotkey", bg="white").pack(side="left", fill="y")
+    hotkey = Frame(self.menu_frame, height=5, bg="white", padx=5, pady=5)
+    hotkey.pack(side=TOP, fill=X)
+    Label(hotkey, text="hotkey", bg="white").pack(side=LEFT, fill=Y)
     self.hotkey_edit_btn = Button(hotkey, command=self.enter_hotkey_mode, text="edit")
-    self.hotkey_edit_btn.pack(side="right", fill="y")
-    self.hotkey_edit_label = Label(hotkey, text="none", bg="white")
-    self.hotkey_edit_label.pack(side="right", fill="y")
+    self.hotkey_edit_btn.pack(side=RIGHT, fill=Y)
+    self.hotkey_edit_label = Label(hotkey, text="none", bg="white", fg="red")
+    self.hotkey_edit_label.pack(side=RIGHT, fill=Y)
     # spammer
-    spammer = Frame(self.menu_frame, height=5, bg="", padx=5, pady=5)
-    spammer.pack(side="top", fill="x")
-    Label(spammer, text="spammer", bg="white").pack(side="left", fill="y")
+    spammer = Frame(self.menu_frame, height=5, bg="white", padx=5, pady=5)
+    spammer.pack(side=TOP, fill=X)
+    Label(spammer, text="spammer", bg="white").pack(side=LEFT, fill=Y)
     self.spammer_lbl = Label(spammer, text="inactive", fg="red", bg="white")
-    self.spammer_lbl.pack(side="right", fill="y")
+    self.spammer_lbl.pack(side=RIGHT, fill=Y)
+
+    # preview
+
+    self.preview_lbl = Label(self.menu_frame, text="preview", bg="white")
+    self.preview_lbl.pack(side=TOP, fill=BOTH, expand=YES)
 
     # selector overlay
     self.master_screen = Toplevel(root)
@@ -176,7 +181,7 @@ class Application():
   def enter_hotkey_mode(self):
     self.hotkey_edit_btn["text"] = "stop"
     self.hotkey_edit_btn["command"] = self.exit_hotkey_mode
-    self.hotkey_edit_btn.pack(side="right", fill="y")
+    self.hotkey_edit_btn.pack(side=RIGHT, fill=Y)
     self.master.bind("<Key>", self.on_hotkey_press)
     # stop listening to the hotkey
     if self.hotkey_listener is not None:
@@ -186,7 +191,7 @@ class Application():
   def exit_hotkey_mode(self):
     self.hotkey_edit_btn["text"] = "edit"
     self.hotkey_edit_btn["command"] = self.enter_hotkey_mode
-    self.hotkey_edit_btn.pack(side="right", fill="y")
+    self.hotkey_edit_btn.pack(side=RIGHT, fill=Y)
     self.master.unbind("<Key>")
     # start listening to the hotkey
     self.hotkey_listener = keyboard.Listener(on_press=self.on_spammer_triggered)
@@ -196,6 +201,7 @@ class Application():
     # unbind previous from master
     self.hotkey_keycode = event.keycode
     self.hotkey_edit_label["text"] = event.keysym
+    self.hotkey_edit_label["fg"] = "black"
     return event
 
   # -----------------------------------------------------------------------------
@@ -281,7 +287,7 @@ def main():
 
   app = Application(root)
 
-  Label(root, text="Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>").pack(side="bottom", fill="x")
+  Label(root, text="Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>").pack(side="bottom", fill=X)
   root.mainloop()
 
 if __name__ == '__main__':
