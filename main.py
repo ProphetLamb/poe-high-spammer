@@ -2,56 +2,10 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
 from tkinter import *
-import pyautogui
-import scipy.ndimage
-import scipy
-from imageio import imwrite
-from itertools import product
-import numpy as np
 from pynput import keyboard, mouse
 import random
 from PIL import Image, ImageTk
-
-def get_cross_kernel(size: int) -> np.ndarray:
-  kernel = np.zeros((size, size), np.uint8)
-  # cross shaped kernel
-  half = size // 2
-  for x,y in product(range(size), range(size)):
-      if x == half or y == half:
-          kernel[x,y] = 1
-  return kernel
-
-def masked_screenshot(region: tuple) -> np.ndarray:
-  """Take a screenshot of the given region and apply some processing to it.
-  Args:
-      region (tuple): the region from top-left in the form (x1, y1, x2, y2)
-  Returns:
-      np.ndarray: the monochrome screenshot taken from the given region
-  """
-  img = pyautogui.screenshot(region=region)
-  # convert the image to a grayscale numpy array
-  img = np.array(img.convert('L'))
-  # apply thresholding
-  # the dark box will turn bright if its a match, so we ought to remove the dark, but keep the bright over the thresholdm
-  # the theshold is around 180, so anything below 180 will be set to 0, anything above that will be set to 255
-  # now the dark box will be 0, and the bright box will be 255, which can easily be detected using the scipy.ndimage.morphology
-  img = (img > 180) * 255
-  # finally apply dilation and erosion to complete possible holes in the bright box border
-  img = scipy.ndimage.morphology.binary_dilation(img, structure=cross_kernel).astype(img.dtype)
-  img = scipy.ndimage.morphology.binary_erosion(img, structure=cross_kernel).astype(img.dtype)
-  # save image
-  return img
-
-def measure_bright_box(mask: np.ndarray) -> int:
-  labels, n = scipy.ndimage.measurements.label(mask, np.ones((3, 3)))
-  # get the bounding boxes of the bright boxes
-  bboxes = scipy.ndimage.measurements.find_objects(labels)
-  if len(bboxes) == 0:
-    return 0
-  # get the largest bounding box
-  largest_bbox = max(bboxes, key=lambda bbox: (bbox[0].stop - bbox[0].start) * (bbox[1].stop - bbox[1].start))
-  # return the area of the largest bounding box
-  return (largest_bbox[0].stop - largest_bbox[0].start) * (largest_bbox[1].stop - largest_bbox[1].start)
+from oir import masked_screenshot, measure_bright_box, get_cross_kernel
 
 class Application():
   def __init__(self, master):
