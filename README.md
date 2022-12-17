@@ -43,9 +43,9 @@ Comparing the highlighted to the non highlighted item below, we can clearly see 
 
 ### Step 0: Start app
 
-Install python, then install `scipy`, `numpy`, `pynput`, `pyautogui` using pip.
+Install python, then install `scipy`, `numpy`, `pynput`, `pyautogui` using pip. Start the app (`python.exe ./main.py`).
 
-Start the app (`python.exe ./main.py`)
+Alternatively download a binary distribution of the application and install or launch that.
 
 ### Step 1: Select target
 
