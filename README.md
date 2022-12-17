@@ -31,7 +31,7 @@ To detect a highlighted item the tool applies filters to a specified screenshot 
 
 2. Apply thresholding to only "see" bright features. <br/> ![Region with thresholding](img/demo-thres.png)
 
-3. Apply closing with a cross kernel to the image. <br/> ![Region with closing](img/demo-close.png)
+3. Apply closing with a cross kernel to the image, in order to compensate for minor "breaks" in shapes. <br/> ![Region with closing](img/demo-close.png)
 
 4. Label major features in the image. <br/> ![Region with boxes](img/demo-boxed.png) <br/> This image has the known feature coordinates rendered in green.
 
@@ -53,9 +53,11 @@ Alternatively download a binary distribution of the application and install or l
 
 1. In a stash-tab, place your target item.
 2. In the "highlight items" search box, enter a filter which highlights the item (e.g. "glove").
-3. switch to the spammer & press "region" to select a tight fit around the item in poe
+3. Switch to the PoE High Spammer & press "region" then select a tight fit around the item in PoE.
 
 ![Select target area](img/select-target.png)
+
+If the best fit fills less then 75% of the selection, then the tool warns the user. Such a state may cause issues when stopping rolling.
 
 ### Step 2: Configure threshold
 
@@ -63,22 +65,22 @@ Alternatively download a binary distribution of the application and install or l
 | -------------------------------------------------------------- |
 | This is guessed automatically and doesnt need to be configured. <br/> The value refers to the sqrt of the area. |
 
-1. read the `area` value in `"found {area}px in {selected}px ({ratio}%)"`
-2. adjust area threshold to a slightly lower value
+1. Read the `area` value in `"found {area}px in {selected}px ({ratio}%)"`.
+2. Adjust area threshold to a slightly lower value.
 
 ![Configure area threshold](img/configure-threshold.png)
 
 ### Step 3: Set hotkey
 
-Press the "edit" button and then any single key, that should toggle the tool, press "stop"..
+Press the "edit" button, followed by any single key that should toggle the tool. Finally press "stop".
 
 ### Step 4: Prepare for action
 
-First adjust the filter in the "highlight items" search box to your target, be strict surround the query with quotes, and use the modifier name if possible.s
+First adjust the filter in the "highlight items" search box to your target, be strict surround the query with quotes, and use the modifier name if possible.
 
 Once the hotkey is toggled the auto-clicker will simulate a mouse left click, until the item is highlighted.
 For this it is important that the box which your item is within is not obscured by the info panel.
-To ensure this doesnt happen hold the `[ALT]` key.
+To ensure this doesn't happen hold the `[ALT]` key.
 To repeatedly use currency hold the `[SHIFT]` key.
 
 In this example we want to alt spam any life roll on our gloves, so we hold `[SHIFT]+[ALT]` and hover over the item, so that the cursor does not overlay the edge of the item-boundary-box (which is used for detecting the match).
@@ -89,6 +91,8 @@ Action will only be taken once per scroll, so that the tool exhibits a maximum o
 
 ### Dont's
 
-Ensure your cursor doesnt obscure the box while spamming. Consider setting the cursor size to small in the options.
+#### Broken border
+
+Ensure your cursor (, or the item on the cursor) do not obscure the bounding box while spamming. Consider setting the cursor size to small in the options.
 
 ![Cursor obscure box boundary](img/cursor-obscure-box.png)
