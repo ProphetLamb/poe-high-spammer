@@ -61,9 +61,9 @@ Alternatively download a binary distribution of the application and install or l
 
 | Note                                                           |
 | -------------------------------------------------------------- |
-| This is guessed automatically and doesnt need to be configured |
+| This is guessed automatically and doesnt need to be configured. <br/> The value refers to the sqrt of the area. |
 
-1. read the pixel value in "largest rec #px"
+1. read the `area` value in `"found {area}px in {selected}px ({ratio}%)"`
 2. adjust area threshold to a slightly lower value
 
 ![Configure area threshold](img/configure-threshold.png)
