@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
-from oir import masked_screenshot, measure_bright_box, get_cross_kernel, render_bboxes, smart_resize
+from oir import masked_screenshot, measure_bright_box, render_bboxes, smart_resize
 from PIL import Image, ImageTk
-from pynput import keyboard, mouse
+from pynput import keyboard
 from snipper import Snipper
 from spammer import Spammer
 from tkinter import *
 import numpy as np
-import random
 import typing as t
 
 class Application():
