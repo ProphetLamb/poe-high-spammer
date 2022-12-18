@@ -5,6 +5,7 @@ import scipy.ndimage
 import scipy
 from itertools import product
 import numpy as np
+from PIL import Image
 
 def get_cross_kernel(size: int) -> np.ndarray:
   """Returns a kernel of given size with a origin symmetric cross shape.
@@ -87,3 +88,47 @@ def measure_bright_box(mask: np.ndarray) -> t.Tuple[int, t.List[tuple]]:
   largest_bbox_area = boundary_box_area(largest_bbox)
   # return the area of the largest bounding box
   return pow(largest_bbox_area,.5), bboxes
+
+def render_bboxes(img: np.ndarray, bboxes: t.List[tuple], primary_color: t.Tuple[int, int, int] = (0, 255, 0), secondary_color: t.Tuple[int, int, int] = (0,110,135)) -> np.ndarray:
+  """Renders bounding boxes to a mono-channel image.
+
+  Args:
+      img (np.ndarray): A openCV image with 1 channel and (floating-point) values between 0 and 1
+      bboxes (t.List[tuple]): The bounding boxes to render
+
+  Returns:
+      np.ndarray: The RGB image with the bounding boxes rendered in the shape (height, width, 3)
+  """
+  # we need to convert it to a PIL image with 3 channels and values between 0 and 255m
+  img = np.multiply(img, 255).astype(np.uint8)
+  img = np.dstack((img,) * 3)
+  # render bounding boxes to the image
+  if len(bboxes) > 0:
+    # first box in green
+    y,x = bboxes[0]
+    img[(y.start,y.stop-1),x]=primary_color
+    img[y,(x.start,x.stop-1)]=primary_color
+    for y,x in bboxes[1:]:
+      # other boxes in teal
+      img[(y.start,y.stop-1),x]=secondary_color
+      img[y,(x.start,x.stop-1)]=secondary_color
+  return img
+
+def smart_resize(img: Image, height: int = None, width: int = None) -> Image:
+  """Resize the given image to the given dimensions while keeping the aspect ratio, if only width or height is defined
+
+  Args:
+      img (Image): The image to resize
+      dims (object): The dimensions to resize to, in the form (width, height) where either width or height can be None
+
+  Returns:
+      Image: The resized image
+  """
+  dims = (img.height, img.width)
+  if width is not None and height is not None:
+    dims = (width, height)
+  elif width is not None:
+    dims = (width, int(width * img.height / img.width))
+  elif height is not None:
+    dims = (int(height * img.width / img.height), height)
+  return img.resize(dims, Image.ANTIALIAS)

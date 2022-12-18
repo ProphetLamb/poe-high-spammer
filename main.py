@@ -5,7 +5,7 @@ from tkinter import *
 from pynput import keyboard, mouse
 import random
 from PIL import Image, ImageTk
-from oir import masked_screenshot, measure_bright_box, get_cross_kernel
+from oir import masked_screenshot, measure_bright_box, get_cross_kernel, render_bboxes, smart_resize
 import numpy as np
 import typing as t
 
@@ -28,7 +28,7 @@ class Application():
     self.cross_kernel = get_cross_kernel(5)
 
     banner = Image.open("./img/banner.png")
-    banner = banner.resize((WIDTH, int(WIDTH * banner.height / banner.width)), Image.ANTIALIAS)
+    banner = smart_resize(banner, width = WIDTH)
     banner_wd = ImageTk.PhotoImage(banner)
     lbl=Label(root, image=banner_wd)
     lbl.image = banner_wd
@@ -139,31 +139,21 @@ class Application():
     img_area = pow(img.shape[0] * img.shape[1],.5)
     fill_ratio = box_area / float(img_area)
 
-    self.select_lbl["text"] = "{}found {}px in {}px ({:2.2f}%)".format("" if fill_ratio > .75 else "LOW CERTAINTY ", int(box_area), int(img_area), fill_ratio * 100)
+    self.select_lbl["text"] = "{}found {}px in {}px ({:2.2f}%)".format(
+      "" if fill_ratio > .75 else "LOW CERTAINTY ",
+      int(box_area),
+      int(img_area),
+      fill_ratio * 100)
     if fill_ratio > .75:
       self.select_lbl["fg"] = "black"
     else:
       self.select_lbl["fg"] = "red"
 
   def update_preview_lbl(self, img: np.ndarray, bboxes: t.List[tuple]):
-    # img is a openCV image with 1 channel and values between 0 and 255
-    # we need to convert it to a PIL image with 3 channels and values between 0 and 255m
-    img = np.multiply(img, 255).astype(np.uint8)
-    img = np.dstack((img,) * 3)
-    # render bounding boxes to the image
-    if len(bboxes) > 0:
-      # first box in green
-      y,x = bboxes[0]
-      img[(y.start,y.stop-1),x]=(0,255,0)
-      img[y,(x.start,x.stop-1)]=(0,255,0)
-      for y,x in bboxes[1:]:
-        # other boxes in teal
-        img[(y.start,y.stop-1),x]=(0,110,135)
-        img[y,(x.start,x.stop-1)]=(0,110,135)
-
+    img = render_bboxes(img, bboxes)
     img = Image.fromarray(img)
-    # fix height to 200px
-    img = img.resize((int(img.size[0] * 250 / img.size[1]), 250), Image.ANTIALIAS)
+    # fix height to 250px
+    img = smart_resize(img, height=250)
     img_wg = ImageTk.PhotoImage(img)
     self.preview_lbl.configure(image=img_wg)
     self.preview_lbl.image = img_wg
