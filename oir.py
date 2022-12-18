@@ -7,21 +7,21 @@ from itertools import product
 import numpy as np
 from PIL import Image
 
-def get_cross_kernel(size: int) -> np.ndarray:
+def get_cross_kernel(size: int, cross: int) -> np.ndarray:
   """Returns a kernel of given size with a origin symmetric cross shape.
 
   Args:
       size (int): The width and height of the kernel.
+      cross (int): The width of the cross.
 
   Returns:
       np.ndarray: The kernel as a numpy array of the shape (size, size).
   """
   kernel = np.zeros((size, size), np.uint8)
   # cross shaped kernel
-  half = size // 2
-  for x,y in product(range(size), range(size)):
-      if x == half or y == half:
-          kernel[x,y] = 1
+  size_2 = size // 2
+  cross_2 = cross // 2
+  kernel[size_2 - cross_2:size_2 + cross_2 + 1, size_2] = 1
   return kernel
 
 def masked_screenshot(region: tuple, kernel: np.ndarray) -> np.ndarray:

@@ -22,7 +22,7 @@ class Application():
     self.scroll_listener = None
     self.queued_scroll = 0
     self.mouse_sim = mouse.Controller()
-    self.cross_kernel = get_cross_kernel(5)
+    self.cross_kernel = get_cross_kernel(5, 3)
 
     # snipper
     self.snipper = Snipper(master)
