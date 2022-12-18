@@ -22,13 +22,13 @@ class Snipper():
     ```
   """
   def __init__(self, master: Tk):
-    self.snip_surface = None
+    self._snip_surface = None
     self.master = master
-    self.start_x = None
-    self.start_y = None
-    self.current_x = None
-    self.current_y = None
-    self.on_select = None
+    self._start_x = None
+    self._start_y = None
+    self._current_x = None
+    self._current_y = None
+    self._on_select = None
 
     # selector overlay
     self.master_screen = Toplevel(master)
@@ -38,18 +38,18 @@ class Snipper():
     self.picture_frame.pack(fill=BOTH, expand=YES)
 
   def set_on_select_cb(self, on_select: t.Callable[[int, int, int, int], None]):
-    self.on_select = on_select
+    self._on_select = on_select
 
   def enter_select_mode(self):
     self.master_screen.deiconify()
     self.master.withdraw()
 
-    self.snip_surface = Canvas(self.picture_frame, cursor="cross", bg="grey11")
-    self.snip_surface.pack(fill=BOTH, expand=YES)
+    self._snip_surface = Canvas(self.picture_frame, cursor="cross", bg="grey11")
+    self._snip_surface.pack(fill=BOTH, expand=YES)
 
-    self.snip_surface.bind("<ButtonPress-1>", self._on_select_button_press)
-    self.snip_surface.bind("<B1-Motion>", self._on_select_drag)
-    self.snip_surface.bind("<ButtonRelease-1>", self._on_select_button_release)
+    self._snip_surface.bind("<ButtonPress-1>", self._on_select_button_press)
+    self._snip_surface.bind("<B1-Motion>", self._on_select_drag)
+    self._snip_surface.bind("<ButtonRelease-1>", self._on_select_button_release)
 
     self.master_screen.attributes('-fullscreen', True)
     self.master_screen.attributes('-alpha', .3)
@@ -58,7 +58,7 @@ class Snipper():
     self.master_screen.bind("<Escape>", self._on_select_cancel)
 
   def exit_select_mode(self):
-    self.snip_surface.destroy()
+    self._snip_surface.destroy()
     self.master_screen.unbind("<Escape>")
     self.master_screen.withdraw()
     self.master.deiconify()
@@ -68,17 +68,17 @@ class Snipper():
     return event
 
   def _on_select_button_release(self, event):
-    if self.start_x <= self.current_x and self.start_y <= self.current_y:
-      self.set_select(self.start_x, self.start_y, self.current_x - self.start_x, self.current_y - self.start_y)
+    if self._start_x <= self._current_x and self._start_y <= self._current_y:
+      self.set_select(self._start_x, self._start_y, self._current_x - self._start_x, self._current_y - self._start_y)
 
-    elif self.start_x >= self.current_x and self.start_y <= self.current_y:
-      self.set_select(self.current_x, self.start_y, self.start_x - self.current_x, self.current_y - self.start_y)
+    elif self._start_x >= self._current_x and self._start_y <= self._current_y:
+      self.set_select(self._current_x, self._start_y, self._start_x - self._current_x, self._current_y - self._start_y)
 
-    elif self.start_x <= self.current_x and self.start_y >= self.current_y:
-      self.set_select(self.start_x, self.current_y, self.current_x - self.start_x, self.start_y - self.current_y)
+    elif self._start_x <= self._current_x and self._start_y >= self._current_y:
+      self.set_select(self._start_x, self._current_y, self._current_x - self._start_x, self._start_y - self._current_y)
 
-    elif self.start_x >= self.current_x and self.start_y >= self.current_y:
-      self.set_select(self.current_x, self.current_y, self.start_x - self.current_x, self.start_y - self.current_y)
+    elif self._start_x >= self._current_x and self._start_y >= self._current_y:
+      self.set_select(self._current_x, self._current_y, self._start_x - self._current_x, self._start_y - self._current_y)
 
     self.exit_select_mode()
     return event
@@ -86,20 +86,20 @@ class Snipper():
   def set_select(self, x1, y1, x2, y2):
     self.select_region = (x1, y1, x2, y2)
     # call the on_select callback
-    if self.on_select is not None:
-      self.on_select(self.select_region)
+    if self._on_select is not None:
+      self._on_select(self.select_region)
 
   def _on_select_button_press(self, event):
     # save mouse drag start position
-    self.start_x = self.snip_surface.canvasx(event.x)
-    self.start_y = self.snip_surface.canvasy(event.y)
-    self.snip_surface.create_rectangle(0, 0, 1, 1, outline='red', width=3, fill="maroon3")
+    self._start_x = self._snip_surface.canvasx(event.x)
+    self._start_y = self._snip_surface.canvasy(event.y)
+    self._snip_surface.create_rectangle(0, 0, 1, 1, outline='red', width=3, fill="maroon3")
     return event
 
   def _on_select_drag(self, event):
-    self.current_x, self.current_y = (event.x, event.y)
+    self._current_x, self._current_y = (event.x, event.y)
     # expand rectangle as you drag the mouse
-    self.snip_surface.coords(1, self.start_x, self.start_y, self.current_x, self.current_y)
+    self._snip_surface.coords(1, self._start_x, self._start_y, self._current_x, self._current_y)
     return event
 
 if __name__ == '__main__':

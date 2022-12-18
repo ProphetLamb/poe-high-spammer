@@ -138,35 +138,6 @@ class Application():
     self.preview_lbl.configure(image=img_wg)
     self.preview_lbl.image = img_wg
 
-  def on_select_button_release(self, event):
-    if self.start_x <= self.current_x and self.start_y <= self.current_y:
-      self.set_select(self.start_x, self.start_y, self.current_x - self.start_x, self.current_y - self.start_y)
-
-    elif self.start_x >= self.current_x and self.start_y <= self.current_y:
-      self.set_select(self.current_x, self.start_y, self.start_x - self.current_x, self.current_y - self.start_y)
-
-    elif self.start_x <= self.current_x and self.start_y >= self.current_y:
-      self.set_select(self.start_x, self.current_y, self.current_x - self.start_x, self.start_y - self.current_y)
-
-    elif self.start_x >= self.current_x and self.start_y >= self.current_y:
-      self.set_select(self.current_x, self.current_y, self.start_x - self.current_x, self.start_y - self.current_y)
-
-    self.exit_select_mode()
-    return event
-
-  def on_select_button_press(self, event):
-    # save mouse drag start position
-    self.start_x = self.snip_surface.canvasx(event.x)
-    self.start_y = self.snip_surface.canvasy(event.y)
-    self.snip_surface.create_rectangle(0, 0, 1, 1, outline='red', width=3, fill="maroon3")
-    return event
-
-  def on_select_drag(self, event):
-    self.current_x, self.current_y = (event.x, event.y)
-    # expand rectangle as you drag the mouse
-    self.snip_surface.coords(1, self.start_x, self.start_y, self.current_x, self.current_y)
-    return event
-
   # -----------------------------------------------------------------------------
   # AREA THRESHOLD
   # -----------------------------------------------------------------------------
