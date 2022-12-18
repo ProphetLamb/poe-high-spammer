@@ -1,11 +1,10 @@
 # Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
-import typing as t
-import pyautogui
-import scipy.ndimage
-import scipy
-from itertools import product
-import numpy as np
 from PIL import Image
+import numpy as np
+import pyautogui
+import scipy
+import scipy.ndimage
+import typing as t
 
 def get_cross_kernel(size: int, cross: int) -> np.ndarray:
   """Returns a kernel of given size with a origin symmetric cross shape.

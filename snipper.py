@@ -2,11 +2,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
 from tkinter import *
-from pynput import keyboard, mouse
-import random
-from PIL import Image, ImageTk
-from oir import masked_screenshot, measure_bright_box, get_cross_kernel, render_bboxes, smart_resize
-import numpy as np
 import typing as t
 
 class Snipper():
