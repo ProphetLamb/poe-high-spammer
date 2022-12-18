@@ -36,9 +36,9 @@ class Application():
     master.resizable(width=False, height=False)
     master.geometry('{}x{}+200+200'.format(width, height))
     master.title('PoE High Spammer')
-    master.iconbitmap("./img/logo.ico")
+    master.iconbitmap("./assets/logo.ico")
 
-    banner = PilImage.open("./img/banner.png")
+    banner = PilImage.open("./assets/banner.png")
     banner = smart_resize(banner, width = width)
     banner_wd = ImageTk.PhotoImage(banner)
     lbl=Label(master, image=banner_wd)
