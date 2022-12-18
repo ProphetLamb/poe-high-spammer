@@ -5,6 +5,7 @@
 # This is the main entry point for the application, when launching from source.
 # It contains the main Tkinter application loop, and is responsible for creating the main window and all of its components.
 
+from debounce import Debouncer
 from oir import get_cross_kernel, largest_bbox, masked_screenshot, measure_bright_box, render_bboxes, smart_resize
 from PIL import Image as PilImage, ImageTk
 from snipper import Snipper
@@ -29,6 +30,7 @@ class Application():
     # spammer
     self.spammer = Spammer(master)
     self.spammer.set_spam_cb(self.on_spam)
+    self.spam_debounce = Debouncer(1000)
 
     # snipper
     self.snipper = Snipper(master)
@@ -210,7 +212,7 @@ class Application():
       self.exit_spam_mode()
       self.update_preview_lbl(mask, bboxes, success=True)
       return False
-    self.update_preview_lbl(mask, bboxes)
+    self.spam_debounce.call(lambda: self.update_preview_lbl(mask, bboxes))
     return True
 
 def main():
