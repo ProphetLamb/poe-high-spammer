@@ -5,6 +5,7 @@ from oir import masked_screenshot, measure_bright_box, get_cross_kernel, render_
 from PIL import Image, ImageTk
 from pynput import keyboard, mouse
 from snipper import Snipper
+from spammer import Spammer
 from tkinter import *
 import numpy as np
 import random
@@ -13,15 +14,11 @@ import typing as t
 class Application():
   def __init__(self, master: Tk):
     self.master = master
-    self.select_region = None
-    self.select_threshold = None
     self.hotkey_keycode = None
     self.hotkey_listener = None
-    self.spammer_active = False
-    self.scroll_listener = None
-    self.queued_scroll = 0
-    self.mouse_sim = mouse.Controller()
-    self.cross_kernel = get_cross_kernel(5, 3)
+
+    # spammer
+    self.spammer = Spammer(master)
 
     # snipper
     self.snipper = Snipper(master)
@@ -99,8 +96,8 @@ class Application():
     self.snipper.enter_select_mode()
 
   def set_select(self, region: t.Tuple[int, int, int, int]):
-    self.select_region = region
-    img = masked_screenshot(self.select_region, self.cross_kernel)
+    self.spammer.select_region = region
+    img = masked_screenshot(region, self.spammer.cross_kernel)
     box_area,bboxes = measure_bright_box(img)
 
     self.update_select_lbl(img, box_area)
@@ -142,7 +139,7 @@ class Application():
   # -----------------------------------------------------------------------------
 
   def on_threshold_change(self, event):
-    self.select_threshold = int(self.threshold_entry.get())
+    self.spammer.select_threshold = int(self.threshold_entry.get())
     return event
 
   # -----------------------------------------------------------------------------
@@ -180,71 +177,26 @@ class Application():
   # -----------------------------------------------------------------------------
 
   def on_spammer_triggered(self, event):
-    if not hasattr(event, "vk"):
-      return self.on_spammer_triggered(event.value)
-    if self.hotkey_keycode == event.vk:
-      if self.spammer_active:
-        self.exit_spam_mode()
-      else:
-        self.enter_spam_mode()
+    keycode = event.vk if hasattr(event, "vk") else event.value.vk
+    if self.hotkey_keycode != keycode:
+      return event
+    if self.spammer.is_active():
+      self.exit_spam_mode()
+    else:
+      self.enter_spam_mode()
     return event
 
   def enter_spam_mode(self):
     self.spammer_lbl["text"] = "active"
     self.spammer_lbl["fg"] = "green"
     # active the spammer
-    self.spammer_active = True
-    self.begin_spam_legal()
+    self.spammer.start()
 
   def exit_spam_mode(self):
     self.spammer_lbl["text"] = "inactive"
     self.spammer_lbl["fg"] = "red"
     # deactivate the spammer
-    self.spammer_active = False
-    self.stop_spam_legal()
-
-  # -----------------------------------------------------------------------------
-  # LEGAL SPAMMING
-  # -----------------------------------------------------------------------------
-
-  def begin_spam_legal(self):
-    """ remaps the scroll wheel to the left mouse button
-    """
-    self.queued_scroll = 0 # reset the scroll queue
-    self.scroll_listener = mouse.Listener(on_scroll=self.on_scroll)
-    self.scroll_listener.start()
-    self.spam_legal_loop()
-
-  def stop_spam_legal(self):
-    """ stops the remapping of the scroll wheel to the left mouse button
-    """
-    if self.scroll_listener is not None:
-      self.scroll_listener.stop()
-      self.scroll_listener = None
-
-  def spam_legal_loop(self):
-    """ consumes the scroll queue and repeats left mouse clicks in random intervals around 4Hz
-    """
-    if not self.spammer_active:
-      return
-    self.master.after(140 + random.randrange(0, 110), self.spam_legal_loop)
-    rem_scroll = self.queued_scroll - 1
-    if rem_scroll >= 0:
-      self.queued_scroll = rem_scroll
-      self.spam_once()
-
-  def on_scroll(self, x, y, dx, dy):
-    # queue scroll actions
-    self.queued_scroll += abs(dx) + abs(dy)
-
-  def spam_once(self):
-    # check whether the selected region exceeds the threshold
-    img = masked_screenshot(self.select_region, self.cross_kernel)
-    area,_ = measure_bright_box(img)
-    if area > self.select_threshold:
-      self.exit_spam_mode()
-    else:
-      self.mouse_sim.click(mouse.Button.left)
+    self.spammer.stop()
 
 def main():
   root = Tk()
