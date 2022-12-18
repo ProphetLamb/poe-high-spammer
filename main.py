@@ -9,14 +9,11 @@ from oir import masked_screenshot, measure_bright_box, get_cross_kernel, render_
 import numpy as np
 import typing as t
 
+from snipper import Snipper
+
 class Application():
   def __init__(self, master: Tk):
-    self.snip_surface = None
     self.master = master
-    self.start_x = None
-    self.start_y = None
-    self.current_x = None
-    self.current_y = None
     self.select_region = None
     self.select_threshold = None
     self.hotkey_keycode = None
@@ -26,6 +23,10 @@ class Application():
     self.queued_scroll = 0
     self.mouse_sim = mouse.Controller()
     self.cross_kernel = get_cross_kernel(5)
+
+    # snipper
+    self.snipper = Snipper(master)
+    self.snipper.set_on_select_cb(self.set_select)
 
     width, height = 400, 600
 
@@ -88,13 +89,6 @@ class Application():
     self.preview_lbl = Label(self.menu_frame, bg="black")
     self.preview_lbl.pack(side=TOP, fill=BOTH, expand=YES)
 
-    # selector overlay
-    self.master_screen = Toplevel(master)
-    self.master_screen.withdraw()
-    self.master_screen.attributes("-transparent", "maroon3")
-    self.picture_frame = Frame(self.master_screen, background="maroon3")
-    self.picture_frame.pack(fill=BOTH, expand=YES)
-
     # copyright
     Label(master, text="Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>").pack(side="bottom", fill=X)
 
@@ -103,34 +97,10 @@ class Application():
   # -----------------------------------------------------------------------------
 
   def enter_select_mode(self):
-    self.master_screen.deiconify()
-    self.master.withdraw()
+    self.snipper.enter_select_mode()
 
-    self.snip_surface = Canvas(self.picture_frame, cursor="cross", bg="grey11")
-    self.snip_surface.pack(fill=BOTH, expand=YES)
-
-    self.snip_surface.bind("<ButtonPress-1>", self.on_select_button_press)
-    self.snip_surface.bind("<B1-Motion>", self.on_select_drag)
-    self.snip_surface.bind("<ButtonRelease-1>", self.on_select_button_release)
-
-    self.master_screen.attributes('-fullscreen', True)
-    self.master_screen.attributes('-alpha', .3)
-    self.master_screen.lift()
-    self.master_screen.attributes("-topmost", True)
-    self.master_screen.bind("<Escape>", self.on_select_cancel)
-
-  def exit_select_mode(self):
-    self.snip_surface.destroy()
-    self.master_screen.unbind("<Escape>")
-    self.master_screen.withdraw()
-    self.master.deiconify()
-
-  def on_select_cancel(self, event):
-    self.exit_select_mode()
-    return event
-
-  def set_select(self, x1, y1, x2, y2):
-    self.select_region = (x1, y1, x2, y2)
+  def set_select(self, region: t.Tuple[int, int, int, int]):
+    self.select_region = region
     img = masked_screenshot(self.select_region, self.cross_kernel)
     box_area,bboxes = measure_bright_box(img)
 
