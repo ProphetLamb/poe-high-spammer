@@ -15,7 +15,7 @@ class Debouncer:
       return True
     return time() - self._last_call > self._interval_s
 
-  def call(self, cb: t.Callable[[np.ndarray, t.List[tuple]], any]) -> t.Optional[any]:
+  def call(self, cb: t.Callable) -> t.Optional[any]:
     if self.is_ready():
       self._last_call = time()
       return cb()
