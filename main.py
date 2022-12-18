@@ -10,7 +10,7 @@ import numpy as np
 import typing as t
 
 class Application():
-  def __init__(self, master):
+  def __init__(self, master: Tk):
     self.snip_surface = None
     self.master = master
     self.start_x = None
@@ -27,10 +27,15 @@ class Application():
     self.mouse_sim = mouse.Controller()
     self.cross_kernel = get_cross_kernel(5)
 
+    master.resizable(width=False, height=False)
+    master.geometry('{}x{}+200+200'.format(WIDTH, HEIGHT))
+    master.title('PoE High Spammer')
+    master.iconbitmap("./img/logo.ico")
+
     banner = Image.open("./img/banner.png")
     banner = smart_resize(banner, width = WIDTH)
     banner_wd = ImageTk.PhotoImage(banner)
-    lbl=Label(root, image=banner_wd)
+    lbl=Label(master, image=banner_wd)
     lbl.image = banner_wd
     lbl.pack()
 
@@ -59,7 +64,7 @@ class Application():
     self.threshold_entry.bind("<Tab>", self.on_threshold_change)
     self.threshold_entry.bind("<FocusOut>", self.on_threshold_change)
 
-    # auto-clicker
+    # spammer
     Label(self.menu_frame, text="spammer").pack(side=TOP, fill=X)
     # hotkey
     hotkey = Frame(self.menu_frame, height=5, bg="white", padx=5, pady=5)
@@ -69,7 +74,7 @@ class Application():
     self.hotkey_edit_btn.pack(side=RIGHT, fill=Y)
     self.hotkey_edit_label = Label(hotkey, text="none", bg="white", fg="red")
     self.hotkey_edit_label.pack(side=RIGHT, fill=Y)
-    # spammer
+    # toggle
     spammer = Frame(self.menu_frame, height=5, bg="white", padx=5, pady=5)
     spammer.pack(side=TOP, fill=X)
     Label(spammer, text="spammer", bg="white").pack(side=LEFT, fill=Y)
@@ -82,11 +87,14 @@ class Application():
     self.preview_lbl.pack(side=TOP, fill=BOTH, expand=YES)
 
     # selector overlay
-    self.master_screen = Toplevel(root)
+    self.master_screen = Toplevel(master)
     self.master_screen.withdraw()
     self.master_screen.attributes("-transparent", "maroon3")
     self.picture_frame = Frame(self.master_screen, background="maroon3")
     self.picture_frame.pack(fill=BOTH, expand=YES)
+
+    # copyright
+    Label(master, text="Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>").pack(side="bottom", fill=X)
 
   # -----------------------------------------------------------------------------
   # REGION SELECTION
@@ -94,7 +102,7 @@ class Application():
 
   def enter_select_mode(self):
     self.master_screen.deiconify()
-    root.withdraw()
+    self.master.withdraw()
 
     self.snip_surface = Canvas(self.picture_frame, cursor="cross", bg="grey11")
     self.snip_surface.pack(fill=BOTH, expand=YES)
@@ -113,7 +121,7 @@ class Application():
     self.snip_surface.destroy()
     self.master_screen.unbind("<Escape>")
     self.master_screen.withdraw()
-    root.deiconify()
+    self.master.deiconify()
 
   def on_select_cancel(self, event):
     self.exit_select_mode()
@@ -277,7 +285,7 @@ class Application():
     """
     if not self.spammer_active:
       return
-    root.after(140 + random.randrange(0, 110), self.spam_legal_loop)
+    self.master.after(140 + random.randrange(0, 110), self.spam_legal_loop)
     rem_scroll = self.queued_scroll - 1
     if rem_scroll >= 0:
       self.queued_scroll = rem_scroll
@@ -297,18 +305,12 @@ class Application():
       self.mouse_sim.click(mouse.Button.left)
 
 def main():
-  global root,app,WIDTH,HEIGHT
+  global app,WIDTH,HEIGHT
   root = Tk()
 
   WIDTH, HEIGHT = 400, 600
-  root.resizable(width=False, height=False)
-  root.geometry('{}x{}+200+200'.format(WIDTH, HEIGHT))
-  root.title('PoE High Spammer')
-  root.iconbitmap("./img/logo.ico")
 
   app = Application(root)
-
-  Label(root, text="Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>").pack(side="bottom", fill=X)
   root.mainloop()
 
 if __name__ == '__main__':
