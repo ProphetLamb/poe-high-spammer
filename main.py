@@ -27,13 +27,15 @@ class Application():
     self.mouse_sim = mouse.Controller()
     self.cross_kernel = get_cross_kernel(5)
 
+    width, height = 400, 600
+
     master.resizable(width=False, height=False)
-    master.geometry('{}x{}+200+200'.format(WIDTH, HEIGHT))
+    master.geometry('{}x{}+200+200'.format(width, height))
     master.title('PoE High Spammer')
     master.iconbitmap("./img/logo.ico")
 
     banner = Image.open("./img/banner.png")
-    banner = smart_resize(banner, width = WIDTH)
+    banner = smart_resize(banner, width = width)
     banner_wd = ImageTk.PhotoImage(banner)
     lbl=Label(master, image=banner_wd)
     lbl.image = banner_wd
@@ -305,11 +307,7 @@ class Application():
       self.mouse_sim.click(mouse.Button.left)
 
 def main():
-  global WIDTH,HEIGHT
   root = Tk()
-
-  WIDTH, HEIGHT = 400, 600
-
   Application(root)
   root.mainloop()
 
