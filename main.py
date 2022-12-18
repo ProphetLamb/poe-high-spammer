@@ -305,12 +305,12 @@ class Application():
       self.mouse_sim.click(mouse.Button.left)
 
 def main():
-  global app,WIDTH,HEIGHT
+  global WIDTH,HEIGHT
   root = Tk()
 
   WIDTH, HEIGHT = 400, 600
 
-  app = Application(root)
+  Application(root)
   root.mainloop()
 
 if __name__ == '__main__':
