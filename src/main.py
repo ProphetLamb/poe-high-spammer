@@ -207,6 +207,14 @@ class Application():
     self.spammer_lbl["text"] = "active"
     self.spammer_lbl["fg"] = "green"
     self.spammer.start()
+    # update the window
+    # this fixes a bug where the window would be psudo-frozen and not update before tickled by user interaction.
+    # this means, that the code would execute, and even the event=loop processed, but the visual update would not happen
+    # updating the window manually doesn't fix this, but focusing in addition to the update does
+    def upd():
+      self.master.update()
+      self.master.focus_force()
+    self.master.after(50, upd)
 
   def exit_spam_mode(self):
     self.spammer_lbl["text"] = "inactive"
