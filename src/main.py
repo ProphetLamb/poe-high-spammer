@@ -136,7 +136,7 @@ class Application():
       self.select_lbl["fg"] = "red"
 
   def update_preview_lbl(self, img: np.ndarray, bboxes: t.List[tuple], success: bool = False, failed: bool = False):
-    background_color = (212,175,55) if success else (178,34,34) if failed else None
+    background_color = (60,250,146) if success else (251,148,220) if failed else None
     img = render_bboxes(img, bboxes, background_color=background_color)
     img = PilImage.fromarray(img)
     # fix height to 250px
