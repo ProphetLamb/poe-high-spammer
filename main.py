@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
 from oir import masked_screenshot, measure_bright_box, render_bboxes, smart_resize
-from PIL import Image, ImageTk
+from PIL import Image as PilImage, ImageTk
 from pynput import keyboard
 from snipper import Snipper
 from spammer import Spammer
@@ -30,7 +30,7 @@ class Application():
     master.title('PoE High Spammer')
     master.iconbitmap("./img/logo.ico")
 
-    banner = Image.open("./img/banner.png")
+    banner = PilImage.open("./img/banner.png")
     banner = smart_resize(banner, width = width)
     banner_wd = ImageTk.PhotoImage(banner)
     lbl=Label(master, image=banner_wd)
@@ -126,7 +126,7 @@ class Application():
 
   def update_preview_lbl(self, img: np.ndarray, bboxes: t.List[tuple]):
     img = render_bboxes(img, bboxes)
-    img = Image.fromarray(img)
+    img = PilImage.fromarray(img)
     # fix height to 250px
     img = smart_resize(img, height=250)
     img_wg = ImageTk.PhotoImage(img)
