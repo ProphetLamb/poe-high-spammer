@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
-from oir import get_cross_kernel, masked_screenshot, measure_bright_box
 from pynput import mouse
 from tkinter import *
 import numpy as np
@@ -11,16 +8,13 @@ import typing as t
 class Spammer:
   def __init__(self, master: Tk):
     self.master = master
-    self.select_region = None
-    self.cross_kernel = get_cross_kernel(5, 3)
-    self.select_threshold = None
     self._spammer_active = False
     self._mouse_sim = mouse.Controller()
     self._queued_scroll = 0
     self._scroll_listener = None
     self._on_spam = None
 
-  def set_on_spam_cb(self, cb: t.Callable[[np.ndarray, t.List[tuple]], None]):
+  def set_spam_cb(self, cb: t.Callable[[np.ndarray, t.List[tuple]], bool]):
     self._on_spam = cb
 
   def is_active(self) -> bool:
@@ -61,26 +55,7 @@ class Spammer:
     self._queued_scroll += abs(dx) + abs(dy)
 
   def _spam_once(self):
-    # check whether the selected region exceeds the threshold
-    img = masked_screenshot(self.select_region, self.cross_kernel)
-    area,bboxes = measure_bright_box(img)
-    # invoke the callback
-    if self._on_spam is not None:
-      self._on_spam(img, bboxes)
-    # check whether the selected region exceeds the threshold ...
-    if area > self.select_threshold:
-      # ... and exit the spam mode if so
-      self.exit_spam_mode()
+    if self._on_spam is None or not self._on_spam():
+      self.stop()
     else:
-      # ... otherwise continue to check
       self._mouse_sim.click(mouse.Button.left)
-
-if __name__ == '__main__':
-  # function test
-  root = Tk()
-  spammer=Spammer(root)
-  spammer.select_region = (0, 0, 100, 100)
-  spammer.select_threshold = 1000
-  spammer.set_on_spam_cb(lambda img, bboxes: print(img.shape, bboxes))
-  root.after(1000, spammer.start)
-  root.mainloop()

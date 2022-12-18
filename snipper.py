@@ -32,7 +32,7 @@ class Snipper():
     self.picture_frame = Frame(self.master_screen, background="maroon3")
     self.picture_frame.pack(fill=BOTH, expand=YES)
 
-  def set_on_select_cb(self, on_select: t.Callable[[int, int, int, int], None]):
+  def set_select_cb(self, on_select: t.Callable[[int, int, int, int], None]):
     self._on_select = on_select
 
   def enter_select_mode(self):
@@ -101,6 +101,6 @@ if __name__ == '__main__':
   # function test
   root = Tk()
   snipper=Snipper(root)
-  snipper.set_on_select_cb(lambda region: print(region))
+  snipper.set_select_cb(lambda region: print(region))
   root.after(1000, snipper.enter_select_mode)
   root.mainloop()

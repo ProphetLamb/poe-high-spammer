@@ -1,27 +1,35 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
-from oir import masked_screenshot, measure_bright_box, render_bboxes, smart_resize
+from oir import get_cross_kernel, largest_bbox, masked_screenshot, measure_bright_box, render_bboxes, smart_resize
 from PIL import Image as PilImage, ImageTk
 from pynput import keyboard
 from snipper import Snipper
 from spammer import Spammer
 from tkinter import *
+from hotkey import HK_BIND, HK_LISTEN, Hotkey, canonicalize
 import numpy as np
 import typing as t
 
 class Application():
   def __init__(self, master: Tk):
     self.master = master
-    self.hotkey_keycode = None
-    self.hotkey_listener = None
+    self.select_threshold = None
+    self.select_region = None
+    self.cross_kernel = get_cross_kernel(5, 3)
+
+    # hotkey
+    self.hotkey = Hotkey()
+    self.hotkey.set_bind_cb(self.on_hotkey_bind)
+    self.hotkey.set_activate_cb(self.on_hotkey_activate)
 
     # spammer
     self.spammer = Spammer(master)
+    self.spammer.set_spam_cb(self.on_spam)
 
     # snipper
     self.snipper = Snipper(master)
-    self.snipper.set_on_select_cb(self.set_select)
+    self.snipper.set_select_cb(self.set_select)
 
     width, height = 400, 600
 
@@ -95,9 +103,9 @@ class Application():
     self.snipper.enter_select_mode()
 
   def set_select(self, region: t.Tuple[int, int, int, int]):
-    self.spammer.select_region = region
-    img = masked_screenshot(region, self.spammer.cross_kernel)
-    box_area,bboxes = measure_bright_box(img)
+    img = masked_screenshot(region, self.cross_kernel)
+    bboxes = measure_bright_box(img)
+    box_area = largest_bbox(bboxes)
 
     self.update_select_lbl(img, box_area)
     self.update_preview_lbl(img, bboxes)
@@ -138,7 +146,7 @@ class Application():
   # -----------------------------------------------------------------------------
 
   def on_threshold_change(self, event):
-    self.spammer.select_threshold = int(self.threshold_entry.get())
+    self.select_threshold = int(self.threshold_entry.get())
     return event
 
   # -----------------------------------------------------------------------------
@@ -149,41 +157,30 @@ class Application():
     self.hotkey_edit_btn["text"] = "stop"
     self.hotkey_edit_btn["command"] = self.exit_hotkey_mode
     self.hotkey_edit_btn.pack(side=RIGHT, fill=Y)
-    self.master.bind("<Key>", self.on_hotkey_press)
-    # stop listening to the hotkey
-    if self.hotkey_listener is not None:
-      self.hotkey_listener.stop()
-      self.hotkey_listener = None
+    self.hotkey.set_mode(HK_BIND)
 
   def exit_hotkey_mode(self):
     self.hotkey_edit_btn["text"] = "edit"
     self.hotkey_edit_btn["command"] = self.enter_hotkey_mode
     self.hotkey_edit_btn.pack(side=RIGHT, fill=Y)
-    self.master.unbind("<Key>")
-    # start listening to the hotkey
-    self.hotkey_listener = keyboard.Listener(on_press=self.on_spammer_triggered)
-    self.hotkey_listener.start()
+    self.hotkey.set_mode(HK_LISTEN)
 
-  def on_hotkey_press(self, event):
+  def on_hotkey_bind(self, hk: Hotkey, key):
     # unbind previous from master
-    self.hotkey_keycode = event.keycode
-    self.hotkey_edit_label["text"] = event.keysym
+    self.hotkey_edit_label["text"] = canonicalize(key)
     self.hotkey_edit_label["fg"] = "black"
-    return event
+    return key
 
   # -----------------------------------------------------------------------------
   # SPAMMER TOGGLE
   # -----------------------------------------------------------------------------
 
-  def on_spammer_triggered(self, event):
-    keycode = event.vk if hasattr(event, "vk") else event.value.vk
-    if self.hotkey_keycode != keycode:
-      return event
+  def on_hotkey_activate(self, hk, key):
     if self.spammer.is_active():
       self.exit_spam_mode()
     else:
       self.enter_spam_mode()
-    return event
+    return key
 
   def enter_spam_mode(self):
     self.spammer_lbl["text"] = "active"
@@ -196,6 +193,18 @@ class Application():
     self.spammer_lbl["fg"] = "red"
     # deactivate the spammer
     self.spammer.stop()
+
+  def on_spam(self) -> bool:
+    mask = masked_screenshot(self.snipper.select_region, self.cross_kernel)
+    bboxes = measure_bright_box(mask)
+    if self.select_threshold is None:
+      self.exit_spam_mode()
+      return False
+    area = largest_bbox(bboxes)
+    if area >= self.select_threshold:
+      self.exit_spam_mode()
+      return False
+    return True
 
 def main():
   root = Tk()

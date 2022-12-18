@@ -67,7 +67,7 @@ def rect_area(rect: t.Tuple[int, int, int, int]) -> int:
   """
   return abs(rect[2] - rect[0]) * abs(rect[3] - rect[1])
 
-def measure_bright_box(mask: np.ndarray) -> t.Tuple[int, t.List[tuple]]:
+def measure_bright_box(mask: np.ndarray) -> t.List[tuple]:
   """Measure the area of the largest shape in the given mask.
 
   Args:
@@ -80,13 +80,12 @@ def measure_bright_box(mask: np.ndarray) -> t.Tuple[int, t.List[tuple]]:
   labels, n = scipy.ndimage.measurements.label(mask, np.ones((3, 3)))
   # get the bounding boxes of the bright boxes
   bboxes: t.List[tuple] = scipy.ndimage.measurements.find_objects(labels)
-  if len(bboxes) == 0:
-    return 0, bboxes
   bboxes.sort(key=lambda bbox: boundary_box_area(bbox), reverse=True)
-  largest_bbox = bboxes[0]
-  largest_bbox_area = boundary_box_area(largest_bbox)
   # return the area of the largest bounding box
-  return pow(largest_bbox_area,.5), bboxes
+  return bboxes
+
+def largest_bbox(bboxes: t.List[tuple]) -> float:
+  return pow(boundary_box_area(bboxes[0]),.5) if bboxes is not None and len(bboxes) > 0.0 else 0.0
 
 def render_bboxes(img: np.ndarray, bboxes: t.List[tuple], primary_color: t.Tuple[int, int, int] = (0, 255, 0), secondary_color: t.Tuple[int, int, int] = (0,110,135)) -> np.ndarray:
   """Renders bounding boxes to a mono-channel image.
