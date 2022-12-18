@@ -23,10 +23,13 @@ class Spammer:
   def set_on_spam_cb(self, cb: t.Callable[[np.ndarray, t.List[tuple]], None]):
     self._on_spam = cb
 
-  def begin_spam(self):
+  def is_active(self) -> bool:
+    return self._spammer_active
+
+  def start(self):
     """ remaps the scroll wheel to the left mouse button
     """
-    self.stop_spam() # ensure that the spammer is not already running
+    self.stop() # ensure that the spammer is not already running
 
     self._spammer_active = True
     self._queued_scroll = 0 # reset the scroll queue
@@ -34,7 +37,7 @@ class Spammer:
     self._scroll_listener.start()
     self._spam_loop()
 
-  def stop_spam(self):
+  def stop(self):
     """ stops the remapping of the scroll wheel to the left mouse button
     """
     self._spammer_active = False
@@ -79,5 +82,5 @@ if __name__ == '__main__':
   spammer.select_region = (0, 0, 100, 100)
   spammer.select_threshold = 1000
   spammer.set_on_spam_cb(lambda img, bboxes: print(img.shape, bboxes))
-  root.after(1000, spammer.begin_spam)
+  root.after(1000, spammer.start)
   root.mainloop()
