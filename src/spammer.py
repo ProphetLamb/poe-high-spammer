@@ -13,6 +13,7 @@ class Spammer:
     self._queued_scroll = 0
     self._scroll_listener = None
     self._on_spam = None
+    self._count = 0
 
   def set_spam_cb(self, cb: t.Callable[[np.ndarray, t.List[tuple]], bool]):
     self._on_spam = cb
@@ -20,12 +21,21 @@ class Spammer:
   def is_active(self) -> bool:
     return self._spammer_active
 
+  def get_count(self) -> int:
+    """ returns the number of left mouse clicks that have been sent since the spammer was started """
+    return self._count
+
+  def get_queued_count(self) -> int:
+    """ returns the number of scroll actions that are queued """
+    return self._queued_scroll
+
   def start(self):
     """ remaps the scroll wheel to the left mouse button
     """
     self.stop() # ensure that the spammer is not already running
 
     self._spammer_active = True
+    self._count = 0
     self._queued_scroll = 0 # reset the scroll queue
     self._scroll_listener = mouse.Listener(on_scroll=self._on_scroll)
     self._scroll_listener.start()
@@ -58,4 +68,5 @@ class Spammer:
     if self._on_spam is None or not self._on_spam():
       self.stop()
     else:
+      self._count += 1
       self._mouse_sim.click(mouse.Button.left)
