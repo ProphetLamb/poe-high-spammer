@@ -17,6 +17,9 @@ import typing as t
 
 class Application():
   def __init__(self, master: Tk):
+    # -----------------------------------------------------------------------------
+    # Properties
+    # -----------------------------------------------------------------------------
     self.master = master
     self.select_threshold = None
     self.select_region = None
@@ -36,7 +39,10 @@ class Application():
     self.snipper = Snipper(master)
     self.snipper.set_select_cb(self.on_select)
 
-    width, height = 400, 600
+    # -----------------------------------------------------------------------------
+    # Layout
+    # -----------------------------------------------------------------------------
+    width, height = 400, 650
 
     master.resizable(width=False, height=False)
     master.geometry('{}x{}+200+200'.format(width, height))
@@ -97,25 +103,16 @@ class Application():
     self.preview_lbl = Label(self.menu_frame, bg="black")
     self.preview_lbl.pack(side=TOP, fill=BOTH, expand=YES)
 
+    # counter
+    self.spammer_counter_lbl = Label(self.menu_frame, text="0 attempts, 0 remaining", bg="white", fg="#FA2FBD")
+    self.spammer_counter_lbl.pack(side=TOP, fill=X)
+
     # copyright
     Label(master, text="Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>").pack(side="bottom", fill=X)
 
   # -----------------------------------------------------------------------------
-  # REGION SELECTION
+  # Update UI
   # -----------------------------------------------------------------------------
-
-  def enter_select_mode(self):
-    self.snipper.enter_select_mode()
-
-  def on_select(self, region: t.Tuple[int, int, int, int]):
-    self.select_region = region
-    img = masked_screenshot(region, self.cross_kernel)
-    bboxes = measure_bright_box(img)
-    box_area = largest_bbox(bboxes)
-
-    self.update_select_lbl(img, box_area)
-    self.update_preview_lbl(img, bboxes)
-    self.update_threshold(box_area)
 
   def update_threshold(self, box_area: float):
     # use 90% of the area rounded down to a multiple of 100 to avoid false positives
@@ -147,8 +144,26 @@ class Application():
     img_wg = ImageTk.PhotoImage(img)
     self.preview_lbl.configure(image=img_wg)
     self.preview_lbl.image = img_wg
-    # the image is not updated until the next idle event
-    self.master.after_idle(self.master.update)
+
+  def update_counter_lbl(self):
+    self.spammer_counter_lbl["text"] = "{} attempts, {} remaining".format(self.spammer.get_count(), self.spammer.get_queued_count())
+
+  # -----------------------------------------------------------------------------
+  # REGION SELECTION
+  # -----------------------------------------------------------------------------
+
+  def enter_select_mode(self):
+    self.snipper.enter_select_mode()
+
+  def on_select(self, region: t.Tuple[int, int, int, int]):
+    self.select_region = region
+    img = masked_screenshot(region, self.cross_kernel)
+    bboxes = measure_bright_box(img)
+    box_area = largest_bbox(bboxes)
+
+    self.update_select_lbl(img, box_area)
+    self.update_preview_lbl(img, bboxes)
+    self.update_threshold(box_area)
 
   # -----------------------------------------------------------------------------
   # AREA THRESHOLD
@@ -204,16 +219,21 @@ class Application():
     mask = masked_screenshot(self.select_region, self.cross_kernel)
     bboxes = measure_bright_box(mask)
     if self.select_threshold is None:
-      self.exit_spam_mode()
-      self.update_preview_lbl(mask, bboxes, failed=True)
+      self.after_spam(mask, bboxes, failed=True)
       return False
     area = largest_bbox(bboxes)
     if area >= self.select_threshold:
-      self.exit_spam_mode()
-      self.update_preview_lbl(mask, bboxes, success=True)
+      self.after_spam(mask, bboxes, success=True)
       return False
-    self.spam_debounce.call(lambda: self.update_preview_lbl(mask, bboxes))
+    self.after_spam(mask, bboxes)
     return True
+
+  def after_spam(self, mask, bboxes, success = False, failed = False):
+    self.update_preview_lbl(mask, bboxes, success, failed)
+    self.update_counter_lbl()
+    if success or failed:
+      self.exit_spam_mode()
+    self.master.after_idle(self.master.update)
 
 def main():
   root = Tk()
