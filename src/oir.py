@@ -87,7 +87,7 @@ def measure_bright_box(mask: np.ndarray) -> t.List[tuple]:
 def largest_bbox(bboxes: t.List[tuple]) -> float:
   return pow(boundary_box_area(bboxes[0]),.5) if bboxes is not None and len(bboxes) > 0.0 else 0.0
 
-def render_bboxes(img: np.ndarray, bboxes: t.List[tuple], primary_color: t.Tuple[int, int, int] = (0, 255, 0), secondary_color: t.Tuple[int, int, int] = (0,110,135)) -> np.ndarray:
+def render_bboxes(img: np.ndarray, bboxes: t.List[tuple], primary_color: t.Tuple[int, int, int] = (0, 255, 0), secondary_color: t.Tuple[int, int, int] = (0,110,135), background_color: t.Tuple[int, int, int] = None) -> np.ndarray:
   """Renders bounding boxes to a mono-channel image.
 
   Args:
@@ -100,6 +100,11 @@ def render_bboxes(img: np.ndarray, bboxes: t.List[tuple], primary_color: t.Tuple
   # we need to convert it to a PIL image with 3 channels and values between 0 and 255m
   img = np.multiply(img, 255).astype(np.uint8)
   img = np.dstack((img,) * 3)
+  # add the background color 0-255 to the image 0-255 and normalize it to 0-255
+  if background_color is not None:
+    img = np.add(img, background_color)
+    img = np.divide(img, 2).astype(np.uint8)
+
   # render bounding boxes to the image
   if len(bboxes) > 0:
     # first box in green

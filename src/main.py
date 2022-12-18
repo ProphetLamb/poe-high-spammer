@@ -32,7 +32,7 @@ class Application():
 
     # snipper
     self.snipper = Snipper(master)
-    self.snipper.set_select_cb(self.set_select)
+    self.snipper.set_select_cb(self.on_select)
 
     width, height = 400, 600
 
@@ -105,7 +105,8 @@ class Application():
   def enter_select_mode(self):
     self.snipper.enter_select_mode()
 
-  def set_select(self, region: t.Tuple[int, int, int, int]):
+  def on_select(self, region: t.Tuple[int, int, int, int]):
+    self.select_region = region
     img = masked_screenshot(region, self.cross_kernel)
     bboxes = measure_bright_box(img)
     box_area = largest_bbox(bboxes)
@@ -135,14 +136,17 @@ class Application():
     else:
       self.select_lbl["fg"] = "red"
 
-  def update_preview_lbl(self, img: np.ndarray, bboxes: t.List[tuple]):
-    img = render_bboxes(img, bboxes)
+  def update_preview_lbl(self, img: np.ndarray, bboxes: t.List[tuple], success: bool = False, failed: bool = False):
+    background_color = (212,175,55) if success else (178,34,34) if failed else None
+    img = render_bboxes(img, bboxes, background_color=background_color)
     img = PilImage.fromarray(img)
     # fix height to 250px
     img = smart_resize(img, height=250)
     img_wg = ImageTk.PhotoImage(img)
     self.preview_lbl.configure(image=img_wg)
     self.preview_lbl.image = img_wg
+    # the image is not updated until the next idle event
+    self.master.after_idle(self.master.update)
 
   # -----------------------------------------------------------------------------
   # AREA THRESHOLD
@@ -168,8 +172,7 @@ class Application():
     self.hotkey_edit_btn.pack(side=RIGHT, fill=Y)
     self.hotkey.set_mode(HK_LISTEN)
 
-  def on_hotkey_bind(self, hk: Hotkey, key):
-    # unbind previous from master
+  def on_hotkey_bind(self, key):
     self.hotkey_edit_label["text"] = canonicalize(key)
     self.hotkey_edit_label["fg"] = "black"
     return key
@@ -178,7 +181,7 @@ class Application():
   # SPAMMER TOGGLE
   # -----------------------------------------------------------------------------
 
-  def on_hotkey_activate(self, hk, key):
+  def on_hotkey_activate(self, key):
     if self.spammer.is_active():
       self.exit_spam_mode()
     else:
@@ -188,25 +191,26 @@ class Application():
   def enter_spam_mode(self):
     self.spammer_lbl["text"] = "active"
     self.spammer_lbl["fg"] = "green"
-    # active the spammer
     self.spammer.start()
 
   def exit_spam_mode(self):
     self.spammer_lbl["text"] = "inactive"
     self.spammer_lbl["fg"] = "red"
-    # deactivate the spammer
     self.spammer.stop()
 
   def on_spam(self) -> bool:
-    mask = masked_screenshot(self.snipper.select_region, self.cross_kernel)
+    mask = masked_screenshot(self.select_region, self.cross_kernel)
     bboxes = measure_bright_box(mask)
     if self.select_threshold is None:
       self.exit_spam_mode()
+      self.update_preview_lbl(mask, bboxes, failed=True)
       return False
     area = largest_bbox(bboxes)
     if area >= self.select_threshold:
       self.exit_spam_mode()
+      self.update_preview_lbl(mask, bboxes, success=True)
       return False
+    self.update_preview_lbl(mask, bboxes)
     return True
 
 def main():

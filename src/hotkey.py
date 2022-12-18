@@ -27,7 +27,7 @@ class Hotkey():
     self._on_activate = None
     self._inter_bind_id = None
 
-  def set_bind_cb(self, cb: t.Callable[[object, object], object]):
+  def set_bind_cb(self, cb: t.Callable[[object], object]):
     """Set the callback for when a hotkey is bound.
 
     Args:
@@ -35,7 +35,7 @@ class Hotkey():
     """
     self._on_bind = cb
 
-  def set_activate_cb(self, cb: t.Callable[[object, object], None]):
+  def set_activate_cb(self, cb: t.Callable[[object], None]):
     """Set the callback for when a hotkey is activated.
 
     Args:
@@ -89,13 +89,13 @@ class Hotkey():
       return key
     if self.bound_key == key:
       if self._on_activate is not None:
-        self._on_activate(self, key)
+        self._on_activate(key)
     return key
 
   def _on_bind_press(self, key):
     if self._on_bind is None:
       self.bound_key = key
     else:
-      self.bound_key=self._on_bind(self, key)
+      self.bound_key=self._on_bind(key)
     return key
 

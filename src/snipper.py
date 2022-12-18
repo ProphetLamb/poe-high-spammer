@@ -79,10 +79,10 @@ class Snipper():
     return event
 
   def set_select(self, x1, y1, x2, y2):
-    self.select_region = (x1, y1, x2, y2)
+    region = (x1, y1, x2, y2)
     # call the on_select callback
     if self._on_select is not None:
-      self._on_select(self.select_region)
+      self._on_select(region)
 
   def _on_select_button_press(self, event):
     # save mouse drag start position
