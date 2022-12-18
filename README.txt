@@ -68,7 +68,7 @@ Press the "edit" button and then any single key, that should toggle the tool, pr
 
 First adjust the filter in the "highlight items" search box to your target, be strict surround the query with quotes, and use the modifier name if possible.s
 
-Once the hotkey is toggled the auto-clicker will simulate a mouse left click, until the item is highlighted.
+Once the hotkey is toggled the spammer will simulate a mouse left click, until the item is highlighted.
 For this it is important that the box which your item is within is not obscured by the info panel.
 To ensure this doesnt happen hold the `[ALT]` key.
 To repeatedly use currency hold the `[SHIFT]` key.

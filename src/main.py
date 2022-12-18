@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
+#
+# This is the main entry point for the application, when launching from source.
+# It contains the main Tkinter application loop, and is responsible for creating the main window and all of its components.
+
 from oir import get_cross_kernel, largest_bbox, masked_screenshot, measure_bright_box, render_bboxes, smart_resize
 from PIL import Image as PilImage, ImageTk
-from pynput import keyboard
 from snipper import Snipper
 from spammer import Spammer
 from tkinter import *
