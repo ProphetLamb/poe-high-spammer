@@ -118,11 +118,11 @@ def smart_resize(img: Image, height: int = None, width: int = None) -> Image:
   """Resize the given image to the given dimensions while keeping the aspect ratio, if only width or height is defined
 
   Args:
-      img (Image): The image to resize
+      img (PIL.Image): The image to resize
       dims (object): The dimensions to resize to, in the form (width, height) where either width or height can be None
 
   Returns:
-      Image: The resized image
+      PIL.Image: The resized image
   """
   dims = (img.height, img.width)
   if width is not None and height is not None:
