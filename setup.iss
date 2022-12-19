@@ -21,7 +21,7 @@ ArchitecturesInstallIn64BitMode=x64
 
 [Files]
 Source: "dist\PoE High Spammer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
-Source: "README.txt"; DestDir: "{app}"; Flags: isreadme
+Source: "README.md"; DestDir: "{app}"; Flags: isreadme
 
 [Icons]
 Name: "{group}\PoE High Spammer"; Filename: "{app}\PoE High Spammer.exe"

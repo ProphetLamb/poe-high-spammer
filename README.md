@@ -56,9 +56,9 @@ To detect a highlighted item the tool applies filters to a specified screenshot 
 
 4. Label major features in the image. <br/> ![Region with boxes](img/demo-boxed.png) <br/> This image has the known feature coordinates rendered in green.
 
-Now we simply calculate the area for the largest feature, which we assume is the box. In this case the area is 25651px^2, and compare it to the "area threshold" 23000px^2. If the area exceeds the threshold, then the box is highlighted.
+Now we simply calculate the area for the largest feature, which we assume is the box. In this case the sqrt area is 160px, and compare it to the "area threshold" 152px. If the area is equal to or exceeds the threshold, then the box is highlighted.
 
-Comparing the highlighted to the non highlighted item below, we can clearly see that the border is missing. Calculating the largest area we obtain 100px^2 which is far below the "area threshold".
+Comparing the highlighted to the non highlighted item below, we can clearly see that the border is missing. Calculating the largest area we obtain 10px which is far below the "area threshold".
 
 ![Not hightlighted region](img/demo-no-highlight.png)
 
@@ -84,7 +84,7 @@ If the best fit fills less then 75% of the selection, then the tool warns the us
 
 | Note                                                           |
 | -------------------------------------------------------------- |
-| This is guessed automatically and doesnt need to be configured. <br/> The value refers to the sqrt of the area. |
+| This is guessed automatically at 95%, and doesn't need to be configured. <br/> The value refers to the sqrt of the area. |
 
 1. Read the `area` value in `"found {area}px in {selected}px ({ratio}%)"`.
 2. Adjust area threshold to a slightly lower value.
