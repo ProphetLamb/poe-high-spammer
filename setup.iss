@@ -1,6 +1,6 @@
 [Setup]
 AppName=PoE High Spammer
-AppVersion=1.2.0
+AppVersion=1.2.1
 WizardStyle=modern
 DefaultDirName={autopf}\PoE High Spammer
 DefaultGroupName=PoE High Spammer
