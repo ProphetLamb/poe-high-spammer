@@ -4,11 +4,15 @@
 PoE High Spammer is a crafting tool for the game Path of Exile.
 At its core it remaps the scroll wheel input to left clicks, a maximum of one action in game is taken per scroll action.
 
-After each reroll ("spamming") the tool checks, if the current filter highlights the item. If so it prevents over-rolling the highlighted state even if the user continuously scrolls.
+After each reroll ("spamming") the tool checks, if the current filter highlights the item. If so the macro is turned off, thus preventing over-rolling the highlighted state even if the user continuously scrolls.
 
 ![Showcase](img/showcase.png)
 
 ## Legality
+
+### Terms of Use
+
+In the following the software PoE High Spammer is referred to as 'macro', and 'spammer'.
 
 The [terms of use](https://www.pathofexile.com/legal/terms-of-use-and-privacy-policy) section 7 restrict tool usage for the game. Many crafting tools such as auto-clickers are prohibited by section c:
 > 7. Restrictions: Under no circumstances, without the prior written approval of Grinding Gear Games, may you:
@@ -22,6 +26,23 @@ To circumvent this limitation it is common to remap left-click to the scroll-whe
 > As for how to actually do it, it seems most commonly if you have a gaming mouse it should come with a control panel software that lets you rebind what mouse buttons do, but I don't think I have that personally, so you'd probably want to look into using AutoHotkey. As GGG tells us that anything that goes beyond 1 click or button-press = 1 server-side action is a ban-able offense, you shouldn't need to learn anything too sophisticated to set up a simple key rebind with AutoHotkey.
 
 This tool uses the same method. We listen to mouse scrolls and count the number of scrolls. This queue of user-actions is then drained one-by-one, so that we have a maximum of one server-action per user-action.
+
+### Thrid-Party Policy
+
+PoE tools need to respect the [3rd party policy](https://www.pathofexile.com/developer/docs#policy) in addition to the terms of use. The relevant section under "Executable apps that run independently from the game" states the following:
+
+>   * Automation of key-strokes (or other inputs) that affect the game in any way must follow our macro rules:
+>
+>     * Macros must be invoked manually by the user (automated invocations such as but not limited to: timers, reacting to file changes, or from reading the screen are not allowed).
+>     * Each macro invocation must have one set function (it cannot cycle between actions).
+>     * The resulting function must only perform one action that interacts with the game (sending a single chat message or command counts as one action).
+>
+>   * Introducing features against these guidelines or our Terms of Use can result in account termination for you as well as your users.
+
+Lets go through this point by point.
+* This macro reads from the screen, but it is not invoked by it, the screen is checked in response to a user scroll action exclusively to turn off the macro. Invocation must occur manually using a hotkey.
+* The macro rebinds a scroll action to a left-click action. This behavior does not change while the macro is active. The scroll wheel always performs a left click while the macro is active.
+* On scroll the macro only perform a single action in game while active.
 
 ## Detection method
 
