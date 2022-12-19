@@ -10,6 +10,10 @@ After each reroll ("spamming") the tool checks, if the current filter highlights
 
 ## Legality
 
+PoE restricts the allowed usage of tools in conjunction with the game heavily. The rules a tool need to fulfill to be 'ethical' and not outright ban-able are defined in the [terms of use](https://www.pathofexile.com/legal/terms-of-use-and-privacy-policy) and [3rd party policy](https://www.pathofexile.com/developer/docs#policy). To the best of my knowledge and research, these are the only two documents defining the restrictions placed upon tools.
+
+In the following sections the conformity to the each document respectively is explored.
+
 ### Terms of Use
 
 In the following the software PoE High Spammer is referred to as 'macro', and 'spammer'.
