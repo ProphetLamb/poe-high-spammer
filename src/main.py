@@ -102,7 +102,7 @@ class Application():
     self.preview_lbl.pack(side=TOP, fill=BOTH, expand=YES)
 
     # counter
-    self.spammer_counter_lbl = Label(self.menu_frame, text="0 attempts, 0 remaining", bg="white", fg="#FA2FBD")
+    self.spammer_counter_lbl = Label(self.menu_frame, text="0 attempts", bg="white", fg="#FA2FBD")
     self.spammer_counter_lbl.pack(side=TOP, fill=X)
 
     # copyright
@@ -144,7 +144,7 @@ class Application():
     self.preview_lbl.image = img_wg
 
   def update_counter_lbl(self):
-    self.spammer_counter_lbl["text"] = "{} attempts, {} remaining".format(self.spammer.get_count(), self.spammer.get_queued_count())
+    self.spammer_counter_lbl["text"] = "{} attempts".format(self.spammer.get_count())
 
   # -----------------------------------------------------------------------------
   # REGION SELECTION

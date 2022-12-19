@@ -10,7 +10,7 @@ class Spammer:
     self.master = master
     self._spammer_active = False
     self._mouse_sim = mouse.Controller()
-    self._queued_scroll = 0
+    self._queued_scroll = False
     self._scroll_listener = None
     self._on_spam = None
     self._count = 0
@@ -25,7 +25,7 @@ class Spammer:
     """ returns the number of left mouse clicks that have been sent since the spammer was started """
     return self._count
 
-  def get_queued_count(self) -> int:
+  def get_queued_count(self) -> bool:
     """ returns the number of scroll actions that are queued """
     return self._queued_scroll
 
@@ -36,7 +36,7 @@ class Spammer:
 
     self._spammer_active = True
     self._count = 0
-    self._queued_scroll = 0 # reset the scroll queue
+    self._queued_scroll = False # reset the scroll queue
     self._scroll_listener = mouse.Listener(on_scroll=self._on_scroll)
     self._scroll_listener.start()
     self._spam_loop()
@@ -55,14 +55,14 @@ class Spammer:
     if not self._spammer_active:
       return
     self.master.after(140 + random.randrange(0, 110), self._spam_loop)
-    rem_scroll = self._queued_scroll - 1
-    if rem_scroll >= 0:
-      self._queued_scroll = rem_scroll
+    queued_scroll = self._queued_scroll
+    self._queued_scroll = False
+    if queued_scroll == True:
       self._spam_once()
 
   def _on_scroll(self, x, y, dx, dy):
     # queue scroll actions
-    self._queued_scroll += abs(dx) + abs(dy)
+    self._queued_scroll = True
 
   def _spam_once(self):
     if self._on_spam is None or not self._on_spam():
