@@ -28,4 +28,4 @@ iscc /Q .\setup.iss
 Move-Item -Force '.\dist\PoE High Spammer.exe' '.\dist\poe-high-spammer-portable.exe'
 Move-Item -Force '.\dist\PoE High Spammer - Setup.exe' '.\dist\poe-high-spammer-setup.exe'
 Remove-Item -Recurse '.\dist\PoE High Spammer\'
-Remove-Item '.\PoE High Spammer Setup.spec'
+Remove-Item '.\PoE High Spammer.spec'
