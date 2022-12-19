@@ -25,7 +25,7 @@ To circumvent this limitation it is common to remap left-click to the scroll-whe
 
 > As for how to actually do it, it seems most commonly if you have a gaming mouse it should come with a control panel software that lets you rebind what mouse buttons do, but I don't think I have that personally, so you'd probably want to look into using AutoHotkey. As GGG tells us that anything that goes beyond 1 click or button-press = 1 server-side action is a ban-able offense, you shouldn't need to learn anything too sophisticated to set up a simple key rebind with AutoHotkey.
 
-This tool uses the same method. We listen to mouse scrolls and count the number of scrolls. This queue of user-actions is then drained one-by-one, so that we have a maximum of one server-action per user-action.
+This tool uses the same method, and listen to mouse scrolls. If the tool is ready and a scroll occurs a left-click is performed, so that we have a maximum of one server-action per user-action.
 
 ### Thrid-Party Policy
 
@@ -107,8 +107,8 @@ To repeatedly use currency hold the `[SHIFT]` key.
 In this example we want to alt spam any life roll on our gloves, so we hold `[SHIFT]+[ALT]` and hover over the item, so that the cursor does not overlay the edge of the item-boundary-box (which is used for detecting the match).
 Now press the hotkey `[COLON]`.
 
-The spammer will reroll until the item is highlighted. This also works with influenced/animated items.
-Action will only be taken once per scroll, so that the tool exhibits a maximum of 1 server action per 1 input.
+The spammer will remain active, until the item is highlighted. This also works with influenced/animated items.
+Action will only be taken at maximum once per scroll, so that the tool exhibits a maximum of 1 server action per 1 input.
 
 ### Dont's
 
