@@ -31,7 +31,7 @@ class Hotkey():
     """Set the callback for when a hotkey is bound.
 
     Args:
-        cb (t.Callable[[GlobalHotkey, object], object]): The callback function returning the key event, accepting `self` and the key event.
+        cb (t.Callable[[Hotkey, object], object]): The callback function returning the key event, accepting `self` and the key event.
     """
     self._on_bind = cb
 
@@ -39,7 +39,7 @@ class Hotkey():
     """Set the callback for when a hotkey is activated.
 
     Args:
-        cb (t.Callable[[GlobalHotkey, object], None]): The callback function accepting `self` and the key event.
+        cb (t.Callable[[Hotkey, object], None]): The callback function accepting `self` and the key event.
     """
     self._on_activate = cb
 
@@ -98,4 +98,3 @@ class Hotkey():
     else:
       self.bound_key=self._on_bind(key)
     return key
-
