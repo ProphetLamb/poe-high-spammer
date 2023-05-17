@@ -8,7 +8,7 @@ import typing as t
 class Recorder:
   def __init__(self):
     self._record_active = False
-    self._listener = mouse.Listener(on_click=self._on_record)
+    self._listener = None
     self._on_replay = None
     self._event_queue = []
 
@@ -46,13 +46,16 @@ class Recorder:
 
     self._record_active = True
     self._event_queue = []
+    self._listener = mouse.Listener(on_click=self._on_record)
     self._listener.start()
 
   def stop(self):
     """ stops the remapping of the scroll wheel to the left mouse button
     """
     self._record_active = False
-    self._listener.stop()
+    if self._listener is not None:
+      self._listener.stop()
+    self._listener = None
 
 class Replay:
   def __init__(self):
