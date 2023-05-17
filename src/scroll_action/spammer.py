@@ -56,7 +56,6 @@ class Spammer:
     """ consumes the scroll queue and repeats left mouse clicks in random intervals around 4Hz
     """
     while self._spammer_active:
-      print("spam loop")
       time.sleep(0.14 + random.random() * 0.02)
       queued_scroll = self._queued_scroll
       self._queued_scroll = False
