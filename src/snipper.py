@@ -4,6 +4,8 @@
 from tkinter import *
 import typing as t
 
+from numpy import sqrt
+
 class Snipper():
   """Allows retrieving a region of the screen using the mouse similar to the snipping tool in windows.
 
@@ -19,11 +21,8 @@ class Snipper():
   def __init__(self, master: Tk):
     self._snip_surface = None
     self.master = master
-    self._start_x = None
-    self._start_y = None
-    self._current_x = None
-    self._current_y = None
     self._on_select = None
+    self.clear_selection()
 
     # selector overlay
     self.master_screen = Toplevel(master)
@@ -31,6 +30,15 @@ class Snipper():
     self.master_screen.attributes("-transparent", "maroon3")
     self.picture_frame = Frame(self.master_screen, background="maroon3")
     self.picture_frame.pack(fill=BOTH, expand=YES)
+
+  def clear_selection(self):
+    self._start_x = None
+    self._start_y = None
+    self._current_x = None
+    self._current_y = None
+
+  def has_selection(self):
+    return not (self._current_y is None or self._start_x is None or self._current_y is None or self._start_y is None)
 
   def set_select_cb(self, on_select: t.Callable[[int, int, int, int], None]):
     self._on_select = on_select
@@ -57,12 +65,18 @@ class Snipper():
     self.master_screen.unbind("<Escape>")
     self.master_screen.withdraw()
     self.master.deiconify()
+    self.clear_selection()
 
   def _on_select_cancel(self, event):
     self.exit_select_mode()
     return event
 
   def _on_select_button_release(self, event):
+    # check if any of self._current_y - self._start_x * self._current_y - self._start_y is None
+    if not self.has_selection():
+      self.exit_select_mode()
+      return event
+
     if self._start_x <= self._current_x and self._start_y <= self._current_y:
       self.set_select(self._start_x, self._start_y, self._current_x - self._start_x, self._current_y - self._start_y)
 

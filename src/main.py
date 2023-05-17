@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Copyright (c) 2022, ProphetLamb <prophet.lamb@gmail.com>
+# Copyright (c) 2023, ProphetLamb <prophet.lamb@gmail.com>
 #
 # This is the main entry point for the application, when launching from source.
 # It contains the main Tkinter application loop, and is responsible for creating the main window and all of its components.
 
 from oir import get_cross_kernel, largest_bbox, masked_screenshot, measure_bright_box, render_bboxes, smart_resize
 from PIL import Image as PilImage, ImageTk
+from scroll_action.spammer import Spammer
+from scroll_action.recorder import Recorder, Replay
+from scroll_listener import ScrollController
 from snipper import Snipper
-from spammer import Spammer
 from tkinter import *
 from hotkey import HK_BIND, HK_LISTEN, Hotkey, canonicalize
 import numpy as np
 import typing as t
 
-class Application():
+class Application:
   def __init__(self, master: Tk):
     # -----------------------------------------------------------------------------
     # Properties
@@ -29,9 +31,13 @@ class Application():
     self.hotkey.set_bind_cb(self.on_hotkey_bind)
     self.hotkey.set_activate_cb(self.on_hotkey_activate)
 
-    # spammer
-    self.spammer = Spammer(master)
-    self.spammer.set_spam_cb(self.on_spam)
+    # controller
+    self.controller_action_spammer = Spammer()
+    self.controller_action_recorder = Recorder()
+    self.controller_action_replay = Replay()
+    self.controller = ScrollController()
+    self.controller.set_action(self.controller_action_spammer)
+    self.controller.set_cb(self.on_spam)
 
     # snipper
     self.snipper = Snipper(master)
@@ -89,10 +95,20 @@ class Application():
     self.hotkey_edit_btn.pack(side=RIGHT, fill=Y)
     self.hotkey_edit_label = Label(hotkey, text="none", bg="white", fg="red")
     self.hotkey_edit_label.pack(side=RIGHT, fill=Y)
+    # mode (spammer/recorder)
+    mode = Frame(self.menu_frame, height=5, bg="white", padx=5, pady=5)
+    mode.pack(side=TOP, fill=X)
+    self.mode_value = StringVar(mode, "spammer")
+    mode_combo = OptionMenu(mode, self.mode_value, "spammer", "recorder", "replay")
+    mode_combo.pack(side=RIGHT, fill=Y)
+    # bind to on_mode_change
+    self.mode_value.trace_add("write", self.on_mode_change)
+
     # toggle
     spammer = Frame(self.menu_frame, height=5, bg="white", padx=5, pady=5)
     spammer.pack(side=TOP, fill=X)
-    Label(spammer, text="spammer", bg="white").pack(side=LEFT, fill=Y)
+    spammer_label=Label(spammer, text="spammer", bg="white")
+    spammer_label.pack(side=LEFT, fill=Y)
     self.spammer_lbl = Label(spammer, text="inactive", fg="red", bg="white")
     self.spammer_lbl.pack(side=RIGHT, fill=Y)
 
@@ -144,7 +160,7 @@ class Application():
     self.preview_lbl.image = img_wg
 
   def update_counter_lbl(self):
-    self.spammer_counter_lbl["text"] = "{} attempts".format(self.spammer.get_count())
+    self.spammer_counter_lbl["text"] = "{} attempts".format(self.controller.get_count())
 
   # -----------------------------------------------------------------------------
   # REGION SELECTION
@@ -196,8 +212,24 @@ class Application():
   # SPAMMER TOGGLE
   # -----------------------------------------------------------------------------
 
+  def on_mode_change(self, var, index, mode):
+    self.exit_spam_mode()
+    value = self.mode_value.get()
+    if value == "spammer":
+      self.controller.set_action(self.controller_action_spammer)
+    elif value == "recorder":
+      self.controller.set_action(self.controller_action_recorder)
+    elif value == "replay":
+      self.controller_action_replay.set_events(self.controller_action_recorder.events())
+      print(self.controller_action_recorder.events())
+      self.controller.set_action(self.controller_action_replay)
+
+  # -----------------------------------------------------------------------------
+  # SPAMMER TOGGLE
+  # -----------------------------------------------------------------------------
+
   def on_hotkey_activate(self, key):
-    if self.spammer.is_active():
+    if self.controller.is_active():
       self.exit_spam_mode()
     else:
       self.enter_spam_mode()
@@ -206,7 +238,7 @@ class Application():
   def enter_spam_mode(self):
     self.spammer_lbl["text"] = "active"
     self.spammer_lbl["fg"] = "green"
-    self.spammer.start()
+    self.controller.start()
     # update the window
     # this fixes a bug where the window would be psudo-frozen and not update before tickled by user interaction.
     # this means, that the code would execute, and even the event=loop processed, but the visual update would not happen
@@ -219,7 +251,7 @@ class Application():
   def exit_spam_mode(self):
     self.spammer_lbl["text"] = "inactive"
     self.spammer_lbl["fg"] = "red"
-    self.spammer.stop()
+    self.controller.stop()
 
   def on_spam(self) -> bool:
     mask = masked_screenshot(self.select_region, self.cross_kernel)
